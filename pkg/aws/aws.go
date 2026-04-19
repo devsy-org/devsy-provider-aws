@@ -24,17 +24,17 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/sirupsen/logrus"
 	"github.com/devsy-org/devsy-provider-aws/pkg/options"
 	"github.com/devsy-org/devsy/pkg/client"
 	"github.com/devsy-org/devsy/pkg/ssh"
 	"github.com/devsy-org/log"
+	"github.com/sirupsen/logrus"
 )
 
 const (
 	tagKeyDevpod               = "devsy"
 	tagKeyHostname             = "devsy:hostname"
-	devsyIAMResourceName      = "devsy-ec2-role"
+	devsyIAMResourceName       = "devsy-ec2-role"
 	iamEC2PolicyName           = "devsy-ec2-policy"
 	iamSSMKMSDecryptPolicyName = "ssm-kms-decrypt-policy"
 )
