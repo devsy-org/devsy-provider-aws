@@ -576,7 +576,10 @@ func buildOptions() Options {
 			Default:     "",
 		},
 		"AWS_USE_ROUTE53": {
-			Description: "If defined, will try to create a Route53 record for the machine's IP address and use that hostname upon machine connection. If activated, the Route53 zone can be configured by AWS_ROUTE53_ZONE_NAME or of not, it is tried to lookup by the tag `devsy=devsy`",
+			Description: "If defined, will try to create a Route53 record for the machine's IP address " +
+				"and use that hostname upon machine connection. If activated, the Route53 zone " +
+				"can be configured by AWS_ROUTE53_ZONE_NAME or if not, it is tried to lookup " +
+				"by the tag `devsy=devsy`",
 			Type:        "boolean",
 			Default:     "false",
 		},
