@@ -580,8 +580,8 @@ func buildOptions() Options {
 				"and use that hostname upon machine connection. If activated, the Route53 zone " +
 				"can be configured by AWS_ROUTE53_ZONE_NAME or if not, it is tried to lookup " +
 				"by the tag `devsy=devsy`",
-			Type:        "boolean",
-			Default:     "false",
+			Type:    "boolean",
+			Default: "false",
 		},
 		"AWS_ROUTE53_ZONE_NAME": {
 			Description: "The zone name of a Route53 hosted zone to use for the machine's DNS name",
