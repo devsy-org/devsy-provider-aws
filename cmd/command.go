@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/skevetter/devpod-provider-aws/pkg/aws"
-	"github.com/skevetter/devpod-provider-aws/pkg/options"
-	"github.com/skevetter/devpod/pkg/ssh"
-	"github.com/skevetter/log"
+	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
+	"github.com/devsy-org/devsy-provider-aws/pkg/options"
+	"github.com/devsy-org/devsy/pkg/ssh"
+	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 	gossh "golang.org/x/crypto/ssh"
 )
@@ -114,7 +114,7 @@ func (s *DirectSSHStrategy) Connect(
 	privateKey []byte,
 ) (*gossh.Client, error) {
 	host := instance.Host()
-	client, err := ssh.NewSSHClient("devpod", host+":22", privateKey)
+	client, err := ssh.NewSSHClient("devsy", host+":22", privateKey)
 	if err != nil {
 		return nil, fmt.Errorf("direct ssh to %s: %w", host, err)
 	}
@@ -168,7 +168,7 @@ func (s *InstanceConnectStrategy) Connect(
 		return nil, fmt.Errorf("%s: %w", s.name, err)
 	}
 
-	client, err := ssh.NewSSHClient("devpod", s.tunnel.Address(), privateKey)
+	client, err := ssh.NewSSHClient("devsy", s.tunnel.Address(), privateKey)
 	if err != nil {
 		_ = s.tunnel.Close()
 		return nil, fmt.Errorf("%s: ssh connect: %w", s.name, err)
@@ -204,7 +204,7 @@ func (s *SessionManagerStrategy) Connect(
 		return nil, fmt.Errorf("%s: %w", s.name, err)
 	}
 
-	client, err := ssh.NewSSHClient("devpod", s.tunnel.Address(), privateKey)
+	client, err := ssh.NewSSHClient("devsy", s.tunnel.Address(), privateKey)
 	if err != nil {
 		_ = s.tunnel.Close()
 		return nil, fmt.Errorf("%s: ssh connect: %w", s.name, err)

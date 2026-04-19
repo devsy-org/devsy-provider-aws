@@ -1,5 +1,5 @@
 env
-devpod-provider-aws
+devsy-provider-aws
 release
 .DS_Store
 dist/

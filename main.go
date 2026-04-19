@@ -1,6 +1,6 @@
 package main
 
-import "github.com/skevetter/devpod-provider-aws/cmd"
+import "github.com/devsy-org/devsy-provider-aws/cmd"
 
 func main() {
 	cmd.Execute()

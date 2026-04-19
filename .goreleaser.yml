@@ -1,5 +1,5 @@
 version: 2
-project_name: devpod-provider-aws
+project_name: devsy-provider-aws
 builds:
   - id: build
     goos: [linux, darwin, windows]

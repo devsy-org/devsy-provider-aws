@@ -48,10 +48,10 @@ func (s *HookSuite) TestHookSnippetInline() {
 	result := hookSnippet("post-ssh", "apt-get update")
 
 	assert.Contains(s.T(), result, "# --- Hook: post-ssh ---")
-	assert.Contains(s.T(), result, "base64 -d > /tmp/devpod-hook-post-ssh.sh")
+	assert.Contains(s.T(), result, "base64 -d > /tmp/devsy-hook-post-ssh.sh")
 	assert.Contains(s.T(), result,
-		"/bin/sh /tmp/devpod-hook-post-ssh.sh >> /var/log/devpod-hook-post-ssh.log 2>&1")
-	assert.Contains(s.T(), result, "rm -f /tmp/devpod-hook-post-ssh.sh")
+		"/bin/sh /tmp/devsy-hook-post-ssh.sh >> /var/log/devsy-hook-post-ssh.log 2>&1")
+	assert.Contains(s.T(), result, "rm -f /tmp/devsy-hook-post-ssh.sh")
 
 	// Verify base64 round-trip: the encoded value should decode back to the original
 	encoded := base64.StdEncoding.EncodeToString([]byte("apt-get update"))
@@ -80,19 +80,19 @@ func (s *HookSuite) TestHookSnippetS3() {
 
 	assert.Contains(s.T(), result, "# --- Hook: post-ssh ---")
 	assert.Contains(s.T(), result,
-		"aws s3 cp s3://my-bucket/scripts/setup.sh /tmp/devpod-hook-post-ssh.sh")
+		"aws s3 cp s3://my-bucket/scripts/setup.sh /tmp/devsy-hook-post-ssh.sh")
 	assert.Contains(s.T(), result,
-		"/bin/sh /tmp/devpod-hook-post-ssh.sh >> /var/log/devpod-hook-post-ssh.log 2>&1")
+		"/bin/sh /tmp/devsy-hook-post-ssh.sh >> /var/log/devsy-hook-post-ssh.log 2>&1")
 	assert.Contains(s.T(), result, "WARNING: post-ssh hook S3 download failed")
-	assert.Contains(s.T(), result, "rm -f /tmp/devpod-hook-post-ssh.sh")
+	assert.Contains(s.T(), result, "rm -f /tmp/devsy-hook-post-ssh.sh")
 }
 
 func (s *HookSuite) TestHookSnippetS3DeepPath() {
 	result := hookSnippet("post-volume", "s3://bucket/a/b/c.sh")
 
 	assert.Contains(s.T(), result,
-		"aws s3 cp s3://bucket/a/b/c.sh /tmp/devpod-hook-post-volume.sh")
-	assert.Contains(s.T(), result, "/var/log/devpod-hook-post-volume.log")
+		"aws s3 cp s3://bucket/a/b/c.sh /tmp/devsy-hook-post-volume.sh")
+	assert.Contains(s.T(), result, "/var/log/devsy-hook-post-volume.log")
 }
 
 func (s *HookSuite) TestHookSnippetS3ShellEscape() {
@@ -108,6 +108,6 @@ func (s *HookSuite) TestHookSnippetHookNameInOutput() {
 	result := hookSnippet("post-volume", "echo hello")
 
 	assert.Contains(s.T(), result, "# --- Hook: post-volume ---")
-	assert.Contains(s.T(), result, "/tmp/devpod-hook-post-volume.sh")
-	assert.Contains(s.T(), result, "/var/log/devpod-hook-post-volume.log")
+	assert.Contains(s.T(), result, "/tmp/devsy-hook-post-volume.sh")
+	assert.Contains(s.T(), result, "/var/log/devsy-hook-post-volume.log")
 }

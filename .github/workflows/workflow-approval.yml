@@ -13,8 +13,8 @@ jobs:
       - uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.DEVSY_GITHUB_APP_ID }}
+          private-key: ${{ secrets.DEVSY_GITHUB_APP_PRIVATE_KEY }}
 
       - uses: mheap/automatic-approve-action@v1
         with:

@@ -199,8 +199,8 @@ func FromEnv(init, withFolder bool) (*Options, error) {
 	if err != nil {
 		return nil, err
 	}
-	// prefix with devpod-
-	retOptions.MachineID = "devpod-" + retOptions.MachineID
+	// prefix with devsy-
+	retOptions.MachineID = "devsy-" + retOptions.MachineID
 
 	if withFolder {
 		retOptions.MachineFolder, err = fromEnvOrError("MACHINE_FOLDER")

@@ -96,8 +96,8 @@ func NewEC2AssumeRolePolicy() PolicyDocument {
 	}
 }
 
-// NewDevPodEC2Policy returns the policy allowing EC2 instance to describe and stop itself.
-func NewDevPodEC2Policy() PolicyDocument {
+// NewDevsyEC2Policy returns the policy allowing EC2 instance to describe and stop itself.
+func NewDevsyEC2Policy() PolicyDocument {
 	return PolicyDocument{
 		Version: "2012-10-17",
 		Statement: []PolicyStatement{

@@ -16,7 +16,7 @@ tasks:
   build:provider:release:
     desc: Build provider.yaml for GitHub release
     env:
-      GITHUB_OWNER: skevetter
+      GITHUB_OWNER: devsy-org
     cmd: go run ./hack/provider/main.go {{ .VERSION }} > ./dist/provider.yaml
     vars:
       VERSION:

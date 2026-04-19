@@ -24,18 +24,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/devsy-org/devsy-provider-aws/pkg/options"
+	"github.com/devsy-org/devsy/pkg/client"
+	"github.com/devsy-org/devsy/pkg/ssh"
+	"github.com/devsy-org/log"
 	"github.com/sirupsen/logrus"
-	"github.com/skevetter/devpod-provider-aws/pkg/options"
-	"github.com/skevetter/devpod/pkg/client"
-	"github.com/skevetter/devpod/pkg/ssh"
-	"github.com/skevetter/log"
 )
 
 const (
-	tagKeyDevpod               = "devpod"
-	tagKeyHostname             = "devpod:hostname"
-	devpodIAMResourceName      = "devpod-ec2-role"
-	iamEC2PolicyName           = "devpod-ec2-policy"
+	tagKeyDevpod               = "devsy"
+	tagKeyHostname             = "devsy:hostname"
+	devsyIAMResourceName       = "devsy-ec2-role"
+	iamEC2PolicyName           = "devsy-ec2-policy"
 	iamSSMKMSDecryptPolicyName = "ssm-kms-decrypt-policy"
 )
 
@@ -379,7 +379,7 @@ func discoverSubnet(ctx context.Context, provider *AwsProvider) (subnetResult, e
 		return subnetResult{}, err
 	}
 
-	if subnet := findTaggedDevPodSubnet(filterByVPC(subnets, vpcID)); subnet != nil {
+	if subnet := findTaggedDevsySubnet(filterByVPC(subnets, vpcID)); subnet != nil {
 		provider.Log.Debugf(
 			"found tagged subnet %s with %d available IPs",
 			*subnet.SubnetId,
@@ -400,12 +400,12 @@ func discoverSubnet(ctx context.Context, provider *AwsProvider) (subnetResult, e
 	if vpcID == "" {
 		return subnetResult{}, fmt.Errorf(
 			"could not find a suitable subnet. Please either specify a subnet ID or VPC ID, or tag the desired" +
-				" subnets with devpod=devpod",
+				" subnets with devsy=devsy",
 		)
 	}
 
 	return subnetResult{}, fmt.Errorf(
-		"no suitable subnet found in VPC %q. Please specify a subnet ID or tag subnets with devpod=devpod",
+		"no suitable subnet found in VPC %q. Please specify a subnet ID or tag subnets with devsy=devsy",
 		vpcID,
 	)
 }
@@ -443,7 +443,7 @@ func filterByVPC(subnets []types.Subnet, vpcID string) []types.Subnet {
 	return filtered
 }
 
-func findTaggedDevPodSubnet(subnets []types.Subnet) *types.Subnet {
+func findTaggedDevsySubnet(subnets []types.Subnet) *types.Subnet {
 	var maxIPCount int32 = -1
 	var selected *types.Subnet
 	for i := range subnets {
@@ -609,7 +609,7 @@ func GetDevpodInstanceProfile(ctx context.Context, provider *AwsProvider) (strin
 	svc := iam.NewFromConfig(provider.AwsConfig)
 
 	roleInput := &iam.GetInstanceProfileInput{
-		InstanceProfileName: aws.String(devpodIAMResourceName),
+		InstanceProfileName: aws.String(devsyIAMResourceName),
 	}
 
 	response, err := svc.GetInstanceProfile(ctx, roleInput)
@@ -644,7 +644,7 @@ func createIAMRole(ctx context.Context, svc *iam.Client) error {
 
 	_, err = svc.CreateRole(ctx, &iam.CreateRoleInput{
 		AssumeRolePolicyDocument: aws.String(string(assumeRolePolicyJSON)),
-		RoleName:                 aws.String(devpodIAMResourceName),
+		RoleName:                 aws.String(devsyIAMResourceName),
 	})
 	if err != nil {
 		var exists *iamtypes.EntityAlreadyExistsException
@@ -657,7 +657,7 @@ func createIAMRole(ctx context.Context, svc *iam.Client) error {
 }
 
 func attachRolePolicies(ctx context.Context, svc *iam.Client, kmsArn string) error {
-	ec2Policy := NewDevPodEC2Policy()
+	ec2Policy := NewDevsyEC2Policy()
 	ec2PolicyJSON, err := json.Marshal(ec2Policy)
 	if err != nil {
 		return fmt.Errorf("marshal EC2 policy: %w", err)
@@ -666,14 +666,14 @@ func attachRolePolicies(ctx context.Context, svc *iam.Client, kmsArn string) err
 	if _, err = svc.PutRolePolicy(ctx, &iam.PutRolePolicyInput{
 		PolicyDocument: aws.String(string(ec2PolicyJSON)),
 		PolicyName:     aws.String(iamEC2PolicyName),
-		RoleName:       aws.String(devpodIAMResourceName),
+		RoleName:       aws.String(devsyIAMResourceName),
 	}); err != nil {
 		return fmt.Errorf("put role policy: %w", err)
 	}
 
 	if _, err = svc.AttachRolePolicy(ctx, &iam.AttachRolePolicyInput{
 		PolicyArn: aws.String("arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"),
-		RoleName:  aws.String(devpodIAMResourceName),
+		RoleName:  aws.String(devsyIAMResourceName),
 	}); err != nil {
 		return fmt.Errorf("attach SSM policy: %w", err)
 	}
@@ -688,7 +688,7 @@ func attachRolePolicies(ctx context.Context, svc *iam.Client, kmsArn string) err
 		if _, err = svc.PutRolePolicy(ctx, &iam.PutRolePolicyInput{
 			PolicyDocument: aws.String(string(kmsPolicyJSON)),
 			PolicyName:     aws.String(iamSSMKMSDecryptPolicyName),
-			RoleName:       aws.String(devpodIAMResourceName),
+			RoleName:       aws.String(devsyIAMResourceName),
 		}); err != nil {
 			return fmt.Errorf("put KMS decrypt policy: %w", err)
 		}
@@ -716,13 +716,13 @@ func createInstanceProfile(ctx context.Context, svc *iam.Client) (string, error)
 
 func createOrGetInstanceProfile(ctx context.Context, svc *iam.Client) (string, error) {
 	response, err := svc.CreateInstanceProfile(ctx, &iam.CreateInstanceProfileInput{
-		InstanceProfileName: aws.String(devpodIAMResourceName),
+		InstanceProfileName: aws.String(devsyIAMResourceName),
 	})
 	if err != nil {
 		var exists *iamtypes.EntityAlreadyExistsException
 		if errors.As(err, &exists) {
 			getResponse, err := svc.GetInstanceProfile(ctx, &iam.GetInstanceProfileInput{
-				InstanceProfileName: aws.String(devpodIAMResourceName),
+				InstanceProfileName: aws.String(devsyIAMResourceName),
 			})
 			if err != nil {
 				return "", fmt.Errorf("get instance profile: %w", err)
@@ -736,8 +736,8 @@ func createOrGetInstanceProfile(ctx context.Context, svc *iam.Client) (string, e
 
 func attachRoleToProfile(ctx context.Context, svc *iam.Client) error {
 	_, err := svc.AddRoleToInstanceProfile(ctx, &iam.AddRoleToInstanceProfileInput{
-		InstanceProfileName: aws.String(devpodIAMResourceName),
-		RoleName:            aws.String(devpodIAMResourceName),
+		InstanceProfileName: aws.String(devsyIAMResourceName),
+		RoleName:            aws.String(devsyIAMResourceName),
 	})
 	if err != nil {
 		var already *iamtypes.EntityAlreadyExistsException
@@ -751,7 +751,7 @@ func attachRoleToProfile(ctx context.Context, svc *iam.Client) error {
 func waitForInstanceProfile(ctx context.Context, svc *iam.Client) error {
 	waiter := iam.NewInstanceProfileExistsWaiter(svc)
 	if err := waiter.Wait(ctx, &iam.GetInstanceProfileInput{
-		InstanceProfileName: aws.String(devpodIAMResourceName),
+		InstanceProfileName: aws.String(devsyIAMResourceName),
 	}, 2*time.Minute); err != nil {
 		return fmt.Errorf("wait for instance profile: %w", err)
 	}
@@ -773,7 +773,7 @@ func GetDevpodSecurityGroups(
 	input := &ec2.DescribeSecurityGroupsInput{
 		Filters: []types.Filter{
 			{
-				Name: aws.String("tag:devpod"),
+				Name: aws.String("tag:devsy"),
 				Values: []string{
 					tagKeyDevpod,
 				},
@@ -829,8 +829,8 @@ func CreateDevpodSecurityGroup(
 
 	// Create the security group with the VPC, name, and description.
 	result, err := svc.CreateSecurityGroup(ctx, &ec2.CreateSecurityGroupInput{
-		GroupName:   aws.String("devpod"),
-		Description: aws.String("Default Security Group for DevPod"),
+		GroupName:   aws.String("devsy"),
+		Description: aws.String("Default Security Group for Devsy"),
 		TagSpecifications: []types.TagSpecification{
 			{
 				ResourceType: "security-group",
@@ -888,7 +888,7 @@ func authorizeSSHIngress(ctx context.Context, svc *ec2.Client, groupID string) e
 				Tags: []types.Tag{
 					{
 						Key:   aws.String(tagKeyDevpod),
-						Value: aws.String("devpod-ingress"),
+						Value: aws.String("devsy-ingress"),
 					},
 				},
 			},
@@ -955,7 +955,7 @@ func GetInstance(
 	input := &ec2.DescribeInstancesInput{
 		Filters: []types.Filter{
 			{
-				Name: aws.String("tag:devpod"),
+				Name: aws.String("tag:devsy"),
 				Values: []string{
 					name,
 				},
@@ -1127,7 +1127,7 @@ func buildRunInstancesInput(
 	providerAws *AwsProvider,
 	subnet subnetResult,
 ) (*ec2.RunInstancesInput, route53Zone, error) {
-	devpodSG, err := resolveSecurityGroups(ctx, providerAws, subnet.vpcID)
+	devsySG, err := resolveSecurityGroups(ctx, providerAws, subnet.vpcID)
 	if err != nil {
 		return nil, route53Zone{}, err
 	}
@@ -1149,7 +1149,7 @@ func buildRunInstancesInput(
 		InstanceType:     types.InstanceType(cfg.MachineType),
 		MinCount:         aws.Int32(1),
 		MaxCount:         aws.Int32(1),
-		SecurityGroupIds: devpodSG,
+		SecurityGroupIds: devsySG,
 		SubnetId:         aws.String(subnet.subnetID),
 		MetadataOptions: &types.InstanceMetadataOptionsRequest{
 			HttpEndpoint:            types.InstanceMetadataEndpointStateEnabled,
@@ -1247,7 +1247,7 @@ func createDataVolume(
 		TagSpecifications: []types.TagSpecification{{
 			ResourceType: types.ResourceTypeVolume,
 			Tags: []types.Tag{
-				{Key: aws.String("Name"), Value: aws.String("devpod-data-" + cfg.MachineID)},
+				{Key: aws.String("Name"), Value: aws.String("devsy-data-" + cfg.MachineID)},
 			},
 		}},
 	}
@@ -1591,19 +1591,19 @@ func GetInjectKeypairScript(config *options.Options) (string, error) {
 	}
 
 	resultScript := `#!/bin/sh
-useradd devpod -d /home/devpod
-mkdir -p /home/devpod
+useradd devsy -d /home/devsy
+mkdir -p /home/devsy
 if grep -q sudo /etc/group; then
-	usermod -aG sudo devpod
+	usermod -aG sudo devsy
 elif grep -q wheel /etc/group; then
-	usermod -aG wheel devpod
+	usermod -aG wheel devsy
 fi
-echo "devpod ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/91-devpod
-mkdir -p /home/devpod/.ssh
-echo "` + string(publicKey) + `" >> /home/devpod/.ssh/authorized_keys
-chmod 0700 /home/devpod/.ssh
-chmod 0600 /home/devpod/.ssh/authorized_keys
-chown -R devpod:devpod /home/devpod`
+echo "devsy ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/91-devsy
+mkdir -p /home/devsy/.ssh
+echo "` + string(publicKey) + `" >> /home/devsy/.ssh/authorized_keys
+chmod 0700 /home/devsy/.ssh
+chmod 0600 /home/devsy/.ssh/authorized_keys
+chown -R devsy:devsy /home/devsy`
 
 	resultScript += hookSnippet("post-ssh", config.HookPostSSH)
 	resultScript += dataVolumeMountScript(config)
@@ -1696,7 +1696,7 @@ if ! mountpoint -q "%[2]s"; then
   echo "ERROR: failed to mount data volume at %[2]s" >&2; exit 1
 fi
 case "$DATA_FSTYPE" in ext4) resize2fs "$DATA_DEV" 2>/dev/null;; xfs) xfs_growfs "%[2]s" 2>/dev/null;; esac
-chown devpod:devpod "%[2]s"
+chown devsy:devsy "%[2]s"
 mkdir -p "%[2]s/.containerd-root" || { echo "ERROR: failed to create containerd root dir" >&2; exit 1; }
 mkdir -p /var/lib/containerd || { echo "ERROR: failed to create /var/lib/containerd" >&2; exit 1; }
 if ! mountpoint -q /var/lib/containerd; then
