@@ -11,8 +11,8 @@ import (
 	r53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 )
 
-// GetDevpodRoute53Zone retrieves the Route53 zone for the devpod if applicable. A zone name can either be specified
-// in the provider configuration or be detected by looking for a Route53 zone with a tag "devpod" with value "devpod".
+// GetDevpodRoute53Zone retrieves the Route53 zone for the devsy if applicable. A zone name can either be specified
+// in the provider configuration or be detected by looking for a Route53 zone with a tag "devsy" with value "devsy".
 func GetDevpodRoute53Zone(ctx context.Context, provider *AwsProvider) (route53Zone, error) {
 	r53client := route53.NewFromConfig(provider.AwsConfig)
 	if provider.Config.Route53ZoneName != "" {
@@ -102,7 +102,7 @@ func detectRoute53ZoneByTag(
 		return allMatches[0], nil
 	default:
 		return route53Zone{}, fmt.Errorf(
-			"found %d hosted zones tagged with devpod=devpod, expected exactly one",
+			"found %d hosted zones tagged with devsy=devsy, expected exactly one",
 			len(allMatches),
 		)
 	}
@@ -193,7 +193,7 @@ type route53Record struct {
 	ip       string
 }
 
-// UpsertDevpodRoute53Record creates or updates a Route53 A record for the devpod hostname in the specified zone.
+// UpsertDevpodRoute53Record creates or updates a Route53 A record for the devsy hostname in the specified zone.
 func UpsertDevpodRoute53Record(
 	ctx context.Context,
 	provider *AwsProvider,
@@ -227,7 +227,7 @@ func UpsertDevpodRoute53Record(
 	return nil
 }
 
-// DeleteDevpodRoute53Record deletes a Route53 A record for the devpod hostname in the specified zone.
+// DeleteDevpodRoute53Record deletes a Route53 A record for the devsy hostname in the specified zone.
 func DeleteDevpodRoute53Record(
 	ctx context.Context,
 	provider *AwsProvider,

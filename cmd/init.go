@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 
-	"github.com/skevetter/devpod-provider-aws/pkg/aws"
-	"github.com/skevetter/devpod-provider-aws/pkg/options"
-	"github.com/skevetter/log"
+	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
+	"github.com/devsy-org/devsy-provider-aws/pkg/options"
+	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 )
 

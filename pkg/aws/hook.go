@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	hookTmpPrefix = "/tmp/devpod-hook-"
-	hookLogPrefix = "/var/log/devpod-hook-"
+	hookTmpPrefix = "/tmp/devsy-hook-"
+	hookLogPrefix = "/var/log/devsy-hook-"
 )
 
 // isS3Reference returns true if the value is an S3 URI (case-sensitive s3:// prefix).
@@ -22,7 +22,7 @@ func isS3Reference(value string) bool {
 // If value is empty, returns "". If value starts with s3://, generates a
 // snippet that fetches the script from S3. Otherwise, base64-encodes the
 // value and generates a snippet that decodes and executes it.
-// All output is logged to /var/log/devpod-hook-<name>.log.
+// All output is logged to /var/log/devsy-hook-<name>.log.
 // Failures emit a warning to stderr but do not halt the script.
 func hookSnippet(name string, value string) string {
 	if value == "" {

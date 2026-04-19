@@ -13,8 +13,8 @@ import (
 
 const (
 	providerName = "aws"
-	githubOwner  = "skevetter"
-	githubRepo   = "devpod-provider-aws"
+	githubOwner  = "devsy-org"
+	githubRepo   = "devsy-provider-aws"
 )
 
 type Provider struct {
@@ -136,9 +136,9 @@ func buildProvider(cfg *buildConfig) Provider {
 	return Provider{
 		Name:         providerName,
 		Version:      cfg.version,
-		Description:  "DevPod on AWS Cloud",
-		Icon:         "https://devpod.sh/assets/aws.svg",
-		IconDark:     "https://devpod.sh/assets/aws_dark.svg",
+		Description:  "Devsy on AWS Cloud",
+		Icon:         "https://raw.githubusercontent.com/devsy-org/devsy/main/desktop/src/images/aws.svg",
+		IconDark:     "https://raw.githubusercontent.com/devsy-org/devsy/main/desktop/src/images/aws_white.svg",
 		OptionGroups: buildOptionGroups(),
 		Options:      buildOptions(),
 		Agent:        buildAgent(cfg),
@@ -576,7 +576,7 @@ func buildOptions() Options {
 			Default:     "",
 		},
 		"AWS_USE_ROUTE53": {
-			Description: "If defined, will try to create a Route53 record for the machine's IP address and use that hostname upon machine connection. If activated, the Route53 zone can be configured by AWS_ROUTE53_ZONE_NAME or of not, it is tried to lookup by the tag `devpod=devpod`",
+			Description: "If defined, will try to create a Route53 record for the machine's IP address and use that hostname upon machine connection. If activated, the Route53 zone can be configured by AWS_ROUTE53_ZONE_NAME or of not, it is tried to lookup by the tag `devsy=devsy`",
 			Type:        "boolean",
 			Default:     "false",
 		},
@@ -589,16 +589,16 @@ func buildOptions() Options {
 			Default:     "10m",
 		},
 		"INJECT_GIT_CREDENTIALS": {
-			Description: "If DevPod should inject git credentials into the remote host.",
+			Description: "If Devsy should inject git credentials into the remote host.",
 			Default:     "true",
 		},
 		"INJECT_DOCKER_CREDENTIALS": {
-			Description: "If DevPod should inject docker credentials into the remote host.",
+			Description: "If Devsy should inject docker credentials into the remote host.",
 			Default:     "true",
 		},
 		"AGENT_PATH": {
-			Description: "The path where to inject the DevPod agent to.",
-			Default:     "/var/lib/toolbox/devpod",
+			Description: "The path where to inject the Devsy agent to.",
+			Default:     "/var/lib/toolbox/devsy",
 		},
 		"CUSTOM_AWS_CREDENTIAL_COMMAND": {
 			Description: "Shell command which is executed to get the AWS credentials. The command must return a json containing the keys `AccessKeyID` (required), `SecretAccessKey` (required) and `SessionToken` (optional).",
@@ -685,7 +685,7 @@ func buildBinary(cfg *buildConfig, platform string) Binary {
 		}
 	}
 
-	filename := fmt.Sprintf("devpod-provider-%s-%s-%s", providerName, os, arch)
+	filename := fmt.Sprintf("devsy-provider-%s-%s-%s", providerName, os, arch)
 	if os == "windows" {
 		filename += ".exe"
 	}
