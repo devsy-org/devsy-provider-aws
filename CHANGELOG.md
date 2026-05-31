@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/devsy-org/devsy-provider-aws/compare/v1.1.0...v1.2.0) (2026-05-31)
+
+
+### Features
+
+* support r8i and r8g instance types ([#3](https://github.com/devsy-org/devsy-provider-aws/issues/3)) ([c5e6fc6](https://github.com/devsy-org/devsy-provider-aws/commit/c5e6fc6f8d67add83b1c284d230542dc45560436))
+
 ## [1.1.0](https://github.com/devsy-org/devsy-provider-aws/compare/v1.0.0...v1.1.0) (2026-04-19)
 
 
