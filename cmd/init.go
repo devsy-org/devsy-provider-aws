@@ -5,7 +5,6 @@ import (
 
 	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
 	"github.com/devsy-org/devsy-provider-aws/pkg/options"
-	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +30,7 @@ func (cmd *InitCmd) Run(ctx context.Context) error {
 		return err
 	}
 
-	_, err = aws.NewAWSConfig(ctx, log.Default, config)
+	_, err = aws.NewAWSConfig(ctx, config)
 	if err != nil {
 		return err
 	}

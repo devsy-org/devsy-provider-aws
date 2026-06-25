@@ -12,7 +12,6 @@ import (
 	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
 	"github.com/devsy-org/devsy-provider-aws/pkg/options"
 	"github.com/devsy-org/devsy/pkg/ssh"
-	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 	gossh "golang.org/x/crypto/ssh"
 )
@@ -27,7 +26,7 @@ func NewCommandCmd() *cobra.Command {
 		Use:   "command",
 		Short: "Command an instance",
 		RunE: func(cobraCmd *cobra.Command, args []string) error {
-			awsProvider, err := aws.NewProvider(cobraCmd.Context(), true, log.Default)
+			awsProvider, err := aws.NewProvider(cobraCmd.Context(), true)
 			if err != nil {
 				return err
 			}

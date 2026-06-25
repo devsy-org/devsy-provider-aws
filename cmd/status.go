@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
-	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +32,7 @@ func NewStatusCmd() *cobra.Command {
 		Use:   "status",
 		Short: "Status an instance",
 		RunE: func(cobraCmd *cobra.Command, args []string) error {
-			awsProvider, err := aws.NewProvider(cobraCmd.Context(), true, log.Default)
+			awsProvider, err := aws.NewProvider(cobraCmd.Context(), true)
 			if err != nil {
 				return err
 			}
