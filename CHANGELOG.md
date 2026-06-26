@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/devsy-org/devsy-provider-aws/compare/v1.2.0...v1.3.0) (2026-06-26)
+
+
+### Miscellaneous Chores
+
+* release 1.3.0 ([#20](https://github.com/devsy-org/devsy-provider-aws/issues/20)) ([e8ff658](https://github.com/devsy-org/devsy-provider-aws/commit/e8ff6584807b3bcd00c583783d89b82f3479ca6a))
+
 ## [1.2.0](https://github.com/devsy-org/devsy-provider-aws/compare/v1.1.0...v1.2.0) (2026-05-31)
 
 
