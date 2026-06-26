@@ -31,7 +31,7 @@ import (
 )
 
 const (
-	tagKeyDevpod               = "devsy"
+	tagKeyDevsy               = "devsy"
 	tagKeyHostname             = "devsy:hostname"
 	devsyIAMResourceName       = "devsy-ec2-role"
 	iamEC2PolicyName           = "devsy-ec2-policy"
@@ -442,7 +442,7 @@ func findTaggedDevsySubnet(subnets []types.Subnet) *types.Subnet {
 		if subnets[i].AvailableIpAddressCount == nil {
 			continue
 		}
-		if isDevpodTagged(subnets[i].Tags) && *subnets[i].AvailableIpAddressCount > maxIPCount {
+		if isDevsyTagged(subnets[i].Tags) && *subnets[i].AvailableIpAddressCount > maxIPCount {
 			maxIPCount = *subnets[i].AvailableIpAddressCount
 			selected = &subnets[i]
 		}
@@ -450,10 +450,10 @@ func findTaggedDevsySubnet(subnets []types.Subnet) *types.Subnet {
 	return selected
 }
 
-func isDevpodTagged(tags []types.Tag) bool {
+func isDevsyTagged(tags []types.Tag) bool {
 	for _, tag := range tags {
 		if tag.Key != nil && tag.Value != nil &&
-			*tag.Key == tagKeyDevpod && *tag.Value == tagKeyDevpod {
+			*tag.Key == tagKeyDevsy && *tag.Value == tagKeyDevsy {
 			return true
 		}
 	}
@@ -482,7 +482,7 @@ func isPublicSubnetInVPC(s *types.Subnet, vpcID string) bool {
 		*s.VpcId == vpcID && *s.MapPublicIpOnLaunch
 }
 
-func GetDevpodVPC(ctx context.Context, provider *AwsProvider) (string, error) {
+func GetDevsyVPC(ctx context.Context, provider *AwsProvider) (string, error) {
 	if provider.Config.VpcID != "" {
 		log.Debugf("using configured VPC %s", provider.Config.VpcID)
 		return provider.Config.VpcID, nil
@@ -589,7 +589,7 @@ func GetAMIRootDevice(ctx context.Context, cfg aws.Config, diskImage string) (st
 	return *result.Images[0].RootDeviceName, nil
 }
 
-func GetDevpodInstanceProfile(ctx context.Context, provider *AwsProvider) (string, error) {
+func GetDevsyInstanceProfile(ctx context.Context, provider *AwsProvider) (string, error) {
 	if provider.Config.InstanceProfileArn != "" {
 		log.Debugf(
 			"using configured instance profile %s",
@@ -606,14 +606,14 @@ func GetDevpodInstanceProfile(ctx context.Context, provider *AwsProvider) (strin
 
 	response, err := svc.GetInstanceProfile(ctx, roleInput)
 	if err != nil {
-		return CreateDevpodInstanceProfile(ctx, provider)
+		return CreateDevsyInstanceProfile(ctx, provider)
 	}
 
 	log.Debugf("using existing instance profile %s", *response.InstanceProfile.Arn)
 	return *response.InstanceProfile.Arn, nil
 }
 
-func CreateDevpodInstanceProfile(ctx context.Context, provider *AwsProvider) (string, error) {
+func CreateDevsyInstanceProfile(ctx context.Context, provider *AwsProvider) (string, error) {
 	svc := iam.NewFromConfig(provider.AwsConfig)
 
 	if err := createIAMRole(ctx, svc); err != nil {
@@ -750,7 +750,7 @@ func waitForInstanceProfile(ctx context.Context, svc *iam.Client) error {
 	return nil
 }
 
-func GetDevpodSecurityGroups(
+func GetDevsySecurityGroups(
 	ctx context.Context,
 	provider *AwsProvider,
 	vpcID string,
@@ -767,7 +767,7 @@ func GetDevpodSecurityGroups(
 			{
 				Name: aws.String("tag:devsy"),
 				Values: []string{
-					tagKeyDevpod,
+					tagKeyDevsy,
 				},
 			},
 		},
@@ -786,7 +786,7 @@ func GetDevpodSecurityGroups(
 	}
 
 	if len(result.SecurityGroups) == 0 {
-		sg, err := CreateDevpodSecurityGroup(ctx, provider, vpcID)
+		sg, err := CreateDevsySecurityGroup(ctx, provider, vpcID)
 		if err != nil {
 			return nil, err
 		}
@@ -804,7 +804,7 @@ func GetDevpodSecurityGroups(
 	return sgs, nil
 }
 
-func CreateDevpodSecurityGroup(
+func CreateDevsySecurityGroup(
 	ctx context.Context,
 	provider *AwsProvider,
 	vpcID string,
@@ -813,7 +813,7 @@ func CreateDevpodSecurityGroup(
 
 	if vpcID == "" {
 		var err error
-		vpcID, err = GetDevpodVPC(ctx, provider)
+		vpcID, err = GetDevsyVPC(ctx, provider)
 		if err != nil {
 			return "", err
 		}
@@ -828,8 +828,8 @@ func CreateDevpodSecurityGroup(
 				ResourceType: "security-group",
 				Tags: []types.Tag{
 					{
-						Key:   aws.String(tagKeyDevpod),
-						Value: aws.String(tagKeyDevpod),
+						Key:   aws.String(tagKeyDevsy),
+						Value: aws.String(tagKeyDevsy),
 					},
 				},
 			},
@@ -879,7 +879,7 @@ func authorizeSSHIngress(ctx context.Context, svc *ec2.Client, groupID string) e
 				ResourceType: "security-group-rule",
 				Tags: []types.Tag{
 					{
-						Key:   aws.String(tagKeyDevpod),
+						Key:   aws.String(tagKeyDevsy),
 						Value: aws.String("devsy-ingress"),
 					},
 				},
@@ -899,7 +899,7 @@ func anyState() []string {
 	}
 }
 
-func GetDevpodInstance(
+func GetDevsyInstance(
 	ctx context.Context,
 	cfg aws.Config,
 	name string,
@@ -907,7 +907,7 @@ func GetDevpodInstance(
 	return GetMachine(ctx, cfg, name, anyState())
 }
 
-func GetDevpodStoppedInstance(
+func GetDevsyStoppedInstance(
 	ctx context.Context,
 	cfg aws.Config,
 	name string,
@@ -915,7 +915,7 @@ func GetDevpodStoppedInstance(
 	return GetMachine(ctx, cfg, name, []string{"stopped"})
 }
 
-func GetDevpodRunningInstance(
+func GetDevsyRunningInstance(
 	ctx context.Context,
 	cfg aws.Config,
 	name string,
@@ -988,7 +988,7 @@ func GetInstanceTags(providerAws *AwsProvider, zone route53Zone) []types.TagSpec
 func buildBaseTags(machineID string, zone route53Zone) []types.Tag {
 	tags := []types.Tag{
 		{Key: aws.String("Name"), Value: aws.String(machineID)},
-		{Key: aws.String(tagKeyDevpod), Value: aws.String(machineID)},
+		{Key: aws.String(tagKeyDevsy), Value: aws.String(machineID)},
 	}
 
 	if zone.id != "" {
@@ -1179,14 +1179,14 @@ func resolveSecurityGroups(
 	if vpcID == "" {
 		vpcID = p.Config.VpcID
 	}
-	return GetDevpodSecurityGroups(ctx, p, vpcID)
+	return GetDevsySecurityGroups(ctx, p, vpcID)
 }
 
 func resolveRoute53Zone(ctx context.Context, p *AwsProvider) (route53Zone, error) {
 	if !p.Config.UseRoute53Hostnames {
 		return route53Zone{}, nil
 	}
-	return GetDevpodRoute53Zone(ctx, p)
+	return GetDevsyRoute53Zone(ctx, p)
 }
 
 func validatedDiskSize(size int) (int32, error) {
@@ -1351,7 +1351,7 @@ func applyInstanceProfile(
 	instance *ec2.RunInstancesInput,
 ) error {
 	log.Debugf("getting instance profile")
-	profile, err := GetDevpodInstanceProfile(ctx, providerAws)
+	profile, err := GetDevsyInstanceProfile(ctx, providerAws)
 	if err != nil {
 		return fmt.Errorf("get instance profile: %w", err)
 	}
@@ -1384,7 +1384,7 @@ func upsertRoute53ForInstance(
 
 	log.Debugf("creating Route53 record: %s -> %s", hostname, ip)
 
-	if err := UpsertDevpodRoute53Record(ctx, providerAws, route53Record{
+	if err := UpsertDevsyRoute53Record(ctx, providerAws, route53Record{
 		zoneID:   zone.id,
 		hostname: hostname,
 		ip:       ip,
@@ -1467,7 +1467,7 @@ func Stop(ctx context.Context, provider *AwsProvider, instanceID string) error {
 func Status(ctx context.Context, provider *AwsProvider, name string) (client.Status, error) {
 	log.Debugf("checking status for machine %s", name)
 
-	result, err := GetDevpodInstance(ctx, provider.AwsConfig, name)
+	result, err := GetDevsyInstance(ctx, provider.AwsConfig, name)
 	if err != nil {
 		if errors.Is(err, ErrInstanceNotFound) {
 			return client.StatusNotFound, nil
@@ -1556,12 +1556,12 @@ func Delete(ctx context.Context, provider *AwsProvider, machine Machine) error {
 	}
 
 	if provider.Config.UseRoute53Hostnames {
-		r53Zone, err := GetDevpodRoute53Zone(ctx, provider)
+		r53Zone, err := GetDevsyRoute53Zone(ctx, provider)
 		if err != nil {
 			return fmt.Errorf("get Route53 zone: %w", err)
 		}
 		if r53Zone.id != "" {
-			if err := DeleteDevpodRoute53Record(ctx, provider, r53Zone, machine); err != nil {
+			if err := DeleteDevsyRoute53Record(ctx, provider, r53Zone, machine); err != nil {
 				return fmt.Errorf("delete Route53 record: %w", err)
 			}
 		}

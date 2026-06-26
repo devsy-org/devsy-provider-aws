@@ -12,9 +12,9 @@ import (
 	"github.com/devsy-org/devsy/pkg/log"
 )
 
-// GetDevpodRoute53Zone retrieves the Route53 zone for the devsy if applicable. A zone name can either be specified
+// GetDevsyRoute53Zone retrieves the Route53 zone for the devsy if applicable. A zone name can either be specified
 // in the provider configuration or be detected by looking for a Route53 zone with a tag "devsy" with value "devsy".
-func GetDevpodRoute53Zone(ctx context.Context, provider *AwsProvider) (route53Zone, error) {
+func GetDevsyRoute53Zone(ctx context.Context, provider *AwsProvider) (route53Zone, error) {
 	r53client := route53.NewFromConfig(provider.AwsConfig)
 	if provider.Config.Route53ZoneName != "" {
 		return findRoute53ZoneByName(ctx, r53client, provider.Config.Route53ZoneName)
@@ -134,7 +134,7 @@ func findTaggedZones(
 		return nil, err
 	}
 
-	return collectDevpodZones(tagSets, hostedZoneById), nil
+	return collectDevsyZones(tagSets, hostedZoneById), nil
 }
 
 const maxTagResourceIDs = 10
@@ -159,13 +159,13 @@ func listTagsInBatches(
 	return allTagSets, nil
 }
 
-func collectDevpodZones(
+func collectDevsyZones(
 	tagSets []r53types.ResourceTagSet,
 	zonesByID map[string]*r53types.HostedZone,
 ) []route53Zone {
 	var matches []route53Zone
 	for _, resourceTagSet := range tagSets {
-		if !hasDevpodTag(resourceTagSet.Tags) {
+		if !hasDevsyTag(resourceTagSet.Tags) {
 			continue
 		}
 		hz := zonesByID[*resourceTagSet.ResourceId]
@@ -178,9 +178,9 @@ func collectDevpodZones(
 	return matches
 }
 
-func hasDevpodTag(tags []r53types.Tag) bool {
+func hasDevsyTag(tags []r53types.Tag) bool {
 	for _, tag := range tags {
-		if *tag.Key == tagKeyDevpod && *tag.Value == tagKeyDevpod {
+		if *tag.Key == tagKeyDevsy && *tag.Value == tagKeyDevsy {
 			return true
 		}
 	}
@@ -194,8 +194,8 @@ type route53Record struct {
 	ip       string
 }
 
-// UpsertDevpodRoute53Record creates or updates a Route53 A record for the devsy hostname in the specified zone.
-func UpsertDevpodRoute53Record(
+// UpsertDevsyRoute53Record creates or updates a Route53 A record for the devsy hostname in the specified zone.
+func UpsertDevsyRoute53Record(
 	ctx context.Context,
 	provider *AwsProvider,
 	record route53Record,
@@ -228,8 +228,8 @@ func UpsertDevpodRoute53Record(
 	return nil
 }
 
-// DeleteDevpodRoute53Record deletes a Route53 A record for the devsy hostname in the specified zone.
-func DeleteDevpodRoute53Record(
+// DeleteDevsyRoute53Record deletes a Route53 A record for the devsy hostname in the specified zone.
+func DeleteDevsyRoute53Record(
 	ctx context.Context,
 	provider *AwsProvider,
 	zone route53Zone,

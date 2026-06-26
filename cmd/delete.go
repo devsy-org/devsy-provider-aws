@@ -30,7 +30,7 @@ func NewDeleteCmd() *cobra.Command {
 
 // Run runs the command logic
 func (cmd *DeleteCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) error {
-	instance, err := aws.GetDevpodInstance(
+	instance, err := aws.GetDevsyInstance(
 		ctx,
 		providerAws.AwsConfig,
 		providerAws.Config.MachineID,
