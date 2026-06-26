@@ -31,7 +31,7 @@ func NewStartCmd() *cobra.Command {
 
 // Run runs the command logic
 func (cmd *StartCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) error {
-	instance, err := aws.GetDevpodStoppedInstance(
+	instance, err := aws.GetDevsyStoppedInstance(
 		ctx,
 		providerAws.AwsConfig,
 		providerAws.Config.MachineID,

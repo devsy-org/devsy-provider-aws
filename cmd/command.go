@@ -48,7 +48,7 @@ func (cmd *CommandCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) er
 		return fmt.Errorf("load private key: %w", err)
 	}
 
-	instance, err := aws.GetDevpodRunningInstance(
+	instance, err := aws.GetDevsyRunningInstance(
 		ctx,
 		providerAws.AwsConfig,
 		providerAws.Config.MachineID,
