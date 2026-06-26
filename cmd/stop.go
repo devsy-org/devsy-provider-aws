@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
-	"github.com/devsy-org/log"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +19,7 @@ func NewStopCmd() *cobra.Command {
 		Use:   "stop",
 		Short: "Stop an instance",
 		RunE: func(cobraCmd *cobra.Command, args []string) error {
-			awsProvider, err := aws.NewProvider(cobraCmd.Context(), false, log.Default)
+			awsProvider, err := aws.NewProvider(cobraCmd.Context(), false)
 			if err != nil {
 				return err
 			}

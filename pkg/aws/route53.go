@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	r53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
+	"github.com/devsy-org/devsy/pkg/log"
 )
 
 // GetDevpodRoute53Zone retrieves the Route53 zone for the devsy if applicable. A zone name can either be specified
@@ -262,7 +263,7 @@ func DeleteDevpodRoute53Record(
 	}); err != nil {
 		var recordNotFoundErr *r53types.InvalidChangeBatch
 		if errors.As(err, &recordNotFoundErr) {
-			provider.Log.Warnf(
+			log.Warnf(
 				"A record %q in zone %q with value %q not found, skipping deletion: %v",
 				machine.Hostname,
 				zone.id,
