@@ -10,13 +10,13 @@ jobs:
     name: Approve Workflows
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@v3
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
         id: app-token
         with:
           app-id: ${{ secrets.DEVSY_GITHUB_APP_ID }}
           private-key: ${{ secrets.DEVSY_GITHUB_APP_PRIVATE_KEY }}
 
-      - uses: mheap/automatic-approve-action@v1
+      - uses: mheap/automatic-approve-action@851272ecb1e93d215b9ab3c16278d434a4fd775b # v1
         with:
           token: ${{ steps.app-token.outputs.token }}
           workflows: "commit.yml,lint.yml,pre-commit.yml"
