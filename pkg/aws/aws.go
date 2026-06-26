@@ -31,7 +31,7 @@ import (
 )
 
 const (
-	tagKeyDevsy               = "devsy"
+	tagKeyDevsy                = "devsy"
 	tagKeyHostname             = "devsy:hostname"
 	devsyIAMResourceName       = "devsy-ec2-role"
 	iamEC2PolicyName           = "devsy-ec2-policy"
