@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.1...v1.3.2) (2026-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/crypto to v0.53.0 ([#26](https://github.com/devsy-org/devsy-provider-aws/issues/26)) ([46eaf25](https://github.com/devsy-org/devsy-provider-aws/commit/46eaf256110c4a210ed8629811b077aaa30f02fe))
+
 ## [1.3.1](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.0...v1.3.1) (2026-06-27)
 
 
