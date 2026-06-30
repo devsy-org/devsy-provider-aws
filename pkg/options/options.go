@@ -20,6 +20,7 @@ var (
 	AWS_INSTANCE_TYPE                   = "AWS_INSTANCE_TYPE"
 	AWS_REGION                          = "AWS_REGION"
 	AWS_SECURITY_GROUP_ID               = "AWS_SECURITY_GROUP_ID"
+	AWS_SSH_INGRESS_CIDR                = "AWS_SSH_INGRESS_CIDR"
 	AWS_SUBNET_ID                       = "AWS_SUBNET_ID"
 	AWS_VPC_ID                          = "AWS_VPC_ID"
 	AWS_AVAILABILITY_ZONE               = "AWS_AVAILABILITY_ZONE"
@@ -79,6 +80,7 @@ type Options struct {
 	SubnetIDs                  []string
 	AvailabilityZone           string
 	SecurityGroupID            string
+	SSHIngressCIDR             string
 	InstanceProfileArn         string
 	InstanceTags               string
 	Zone                       string
@@ -189,6 +191,7 @@ func applyInstanceOptions(o *Options) error {
 
 func applyConnectivityOptions(o *Options) {
 	o.SecurityGroupID = os.Getenv(AWS_SECURITY_GROUP_ID)
+	o.SSHIngressCIDR = os.Getenv(AWS_SSH_INGRESS_CIDR)
 	o.UseInstanceConnectEndpoint = os.Getenv(AWS_USE_INSTANCE_CONNECT_ENDPOINT) == strTrue
 	o.InstanceConnectEndpointID = os.Getenv(AWS_INSTANCE_CONNECT_ENDPOINT_ID)
 	o.UseSpotInstance = os.Getenv(AWS_USE_SPOT_INSTANCE) == strTrue
@@ -206,7 +209,9 @@ func applyConnectivityOptions(o *Options) {
 
 	if subnetIDs := os.Getenv(AWS_SUBNET_ID); subnetIDs != "" {
 		for subnetID := range strings.SplitSeq(subnetIDs, ",") {
-			o.SubnetIDs = append(o.SubnetIDs, strings.TrimSpace(subnetID))
+			if trimmed := strings.TrimSpace(subnetID); trimmed != "" {
+				o.SubnetIDs = append(o.SubnetIDs, trimmed)
+			}
 		}
 	}
 }

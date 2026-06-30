@@ -167,5 +167,5 @@ func TestNewMachineFromInstanceHostnameTag(t *testing.T) {
 	assert.Equal(t, "i-123", m.InstanceID)
 	assert.Equal(t, "box.devsy.dev", m.Hostname)
 	assert.Equal(t, "running", m.Status)
-	assert.True(t, strings.HasPrefix(m.Host(), "box.devsy.dev"))
+	assert.Equal(t, "box.devsy.dev", m.Host())
 }

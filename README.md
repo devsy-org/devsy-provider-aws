@@ -45,8 +45,9 @@ devsy provider set-options -o AWS_DEPLOYMENT_MODE=kubernetes
 In `kubernetes` mode the provider:
 
 - installs K3s during instance setup and waits for the node to become `Ready`,
-- writes a world-readable kubeconfig to `/etc/rancher/k3s/k3s.yaml`, which the
-  devsy agent on the instance uses to talk to the local cluster, and
+- restricts the cluster-admin kubeconfig at `/etc/rancher/k3s/k3s.yaml` to
+  `root:devsy` (mode `0640`), so the devsy agent on the instance can talk to the
+  local cluster while other local users cannot, and
 - runs the devcontainer as a pod in the `AWS_KUBERNETES_NAMESPACE` namespace
   (default `devsy`), creating the namespace if needed.
 
@@ -61,7 +62,7 @@ the volume instead of the root disk.
 | ------------------------ | -------- | ------------------------------------------------------------------ | -------- |
 | AWS_DEPLOYMENT_MODE      | false    | How the devcontainer runs: `docker` or `kubernetes` (K3s).         | docker   |
 | AWS_KUBERNETES_NAMESPACE | false    | Namespace for the devcontainer pod (kubernetes mode only).         | devsy    |
-| AWS_K3S_VERSION          | false    | Pin a specific K3s version, e.g. `v1.30.2+k3s1` (kubernetes only). | latest   |
+| AWS_K3S_VERSION          | false    | Pin a specific K3s version, e.g. `v1.30.2+k3s1` (kubernetes only). | latest stable |
 | AWS_K3S_CHANNEL          | false    | K3s release channel, e.g. `stable` (ignored if version is set).    |          |
 
 ### Customize the VM Instance
@@ -77,6 +78,7 @@ This provider has the following options
 | AWS_REGION               | true     | The aws cloud region to create the VM                             |                                                                       |
 | AWS_VPC_ID               | false    | The vpc id to use.                                                |                                                                       |
 | AWS_SECURITY_GROUP_ID    | false    | The security group ID is a comma separated list of IDs for the VM | created if not specified                                              |
+| AWS_SSH_INGRESS_CIDR     | false    | CIDR allowed to reach SSH on a provider-created security group; restrict to a trusted range. Ignored when a security group is supplied or Session Manager is used. | 0.0.0.0/0 |
 | AWS_SUBNET_ID            | false    | The subnet ID for the VM                                          | created if not specified                                              |
 | AWS_INSTANCE_TAGS        | false    | Additional flags for the VM in the form of "Name=XXX,Value=YYY "  |                                                                       |
 | AWS_INSTANCE_PROFILE_ARN | false    | The ARN of the instance profile to use for the VM                 | created if not specified                                              |

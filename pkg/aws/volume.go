@@ -121,18 +121,22 @@ func deleteVolumeIfPresent(awsCfg aws.Config, volumeID string) {
 // is still in-use (e.g. instance is terminating), it waits for it to become
 // available before deleting.
 func deleteVolume(awsCfg aws.Config, volumeID string) {
-	cleanupCtx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
 	svc := ec2.NewFromConfig(awsCfg)
 
+	waitCtx, cancelWait := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancelWait()
 	waiter := ec2.NewVolumeAvailableWaiter(svc)
-	if err := waiter.Wait(cleanupCtx, &ec2.DescribeVolumesInput{
+	if err := waiter.Wait(waitCtx, &ec2.DescribeVolumesInput{
 		VolumeIds: []string{volumeID},
 	}, 5*time.Minute); err != nil {
 		log.Warnf("failed to wait for volume %s to become available: %v", volumeID, err)
 	}
 
-	if _, err := svc.DeleteVolume(cleanupCtx, &ec2.DeleteVolumeInput{
+	// Use a separate timeout so a slow detach wait cannot leave the delete with
+	// an already-expired context and leak the volume.
+	deleteCtx, cancelDelete := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancelDelete()
+	if _, err := svc.DeleteVolume(deleteCtx, &ec2.DeleteVolumeInput{
 		VolumeId: aws.String(volumeID),
 	}); err != nil {
 		log.Warnf("failed to delete volume %s: %v", volumeID, err)

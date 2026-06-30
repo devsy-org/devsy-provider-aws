@@ -24,6 +24,27 @@ func TestFromEnv_DeploymentModeDefault(t *testing.T) {
 	assert.Equal(t, "devsy", opts.KubernetesNamespace)
 }
 
+func TestFromEnv_SubnetIDsSkipsBlanks(t *testing.T) {
+	setRequiredEnv(t)
+	t.Setenv(AWS_SUBNET_ID, "subnet-1, subnet-2,")
+
+	opts, err := FromEnv(true, false)
+	require.NoError(t, err)
+	assert.Equal(t, []string{"subnet-1", "subnet-2"}, opts.SubnetIDs)
+}
+
+func TestFromEnv_SSHIngressCIDR(t *testing.T) {
+	setRequiredEnv(t)
+	opts, err := FromEnv(true, false)
+	require.NoError(t, err)
+	assert.Empty(t, opts.SSHIngressCIDR, "unset by default; caller applies 0.0.0.0/0")
+
+	t.Setenv(AWS_SSH_INGRESS_CIDR, "10.0.0.0/8")
+	opts, err = FromEnv(true, false)
+	require.NoError(t, err)
+	assert.Equal(t, "10.0.0.0/8", opts.SSHIngressCIDR)
+}
+
 func TestFromEnv_DeploymentModeKubernetes(t *testing.T) {
 	setRequiredEnv(t)
 	t.Setenv(AWS_DEPLOYMENT_MODE, DeploymentModeKubernetes)

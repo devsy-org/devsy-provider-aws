@@ -230,30 +230,34 @@ func upsertRoute53ForInstance(
 		return "", nil
 	}
 	hostname := providerAws.Config.MachineID + "." + zone.Name
-	ip := *inst.PrivateIpAddress
 
+	// recordIP is what the DNS record points at; publicIP is only set for a
+	// public zone, where the record target is genuinely the instance's public
+	// address. For a private zone the record points at the private IP, which
+	// must not be reported back as Machine.PublicIP.
+	recordIP := *inst.PrivateIpAddress
+	publicIP := ""
 	if !zone.private {
 		svc := ec2.NewFromConfig(providerAws.AwsConfig)
-
-		publicIP, err := resolvePublicIP(ctx, svc, inst)
+		resolved, err := resolvePublicIP(ctx, svc, inst)
 		if err != nil {
 			return "", err
 		}
-
-		ip = publicIP
+		recordIP = resolved
+		publicIP = resolved
 	}
 
-	log.Debugf("creating Route53 record: %s -> %s", hostname, ip)
+	log.Debugf("creating Route53 record: %s -> %s", hostname, recordIP)
 
 	if err := UpsertDevsyRoute53Record(ctx, providerAws, route53Record{
 		zoneID:   zone.id,
 		hostname: hostname,
-		ip:       ip,
+		ip:       recordIP,
 	}); err != nil {
 		return "", err
 	}
 
-	return ip, nil
+	return publicIP, nil
 }
 
 func resolvePublicIP(

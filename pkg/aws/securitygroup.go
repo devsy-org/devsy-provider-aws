@@ -17,7 +17,7 @@ func GetDevsySecurityGroups(
 	vpcID string,
 ) ([]string, error) {
 	if provider.Config.SecurityGroupID != "" {
-		sgs := strings.Split(provider.Config.SecurityGroupID, ",")
+		sgs := splitAndTrim(provider.Config.SecurityGroupID)
 		log.Debugf("using configured security groups %v", sgs)
 		return sgs, nil
 	}
@@ -108,7 +108,7 @@ func CreateDevsySecurityGroup(
 		return groupID, nil
 	}
 
-	if err := authorizeSSHIngress(ctx, svc, groupID); err != nil {
+	if err := authorizeSSHIngress(ctx, svc, groupID, provider.Config.SSHIngressCIDR); err != nil {
 		if _, delErr := svc.DeleteSecurityGroup(ctx, &ec2.DeleteSecurityGroupInput{
 			GroupId: aws.String(groupID),
 		}); delErr != nil {
@@ -120,7 +120,10 @@ func CreateDevsySecurityGroup(
 	return groupID, nil
 }
 
-func authorizeSSHIngress(ctx context.Context, svc *ec2.Client, groupID string) error {
+func authorizeSSHIngress(ctx context.Context, svc *ec2.Client, groupID, cidr string) error {
+	if cidr == "" {
+		cidr = "0.0.0.0/0"
+	}
 	_, err := svc.AuthorizeSecurityGroupIngress(ctx, &ec2.AuthorizeSecurityGroupIngressInput{
 		GroupId: aws.String(groupID),
 		IpPermissions: []types.IpPermission{
@@ -130,7 +133,7 @@ func authorizeSSHIngress(ctx context.Context, svc *ec2.Client, groupID string) e
 				ToPort:     aws.Int32(22),
 				IpRanges: []types.IpRange{
 					{
-						CidrIp: aws.String("0.0.0.0/0"),
+						CidrIp: aws.String(cidr),
 					},
 				},
 			},
@@ -148,4 +151,16 @@ func authorizeSSHIngress(ctx context.Context, svc *ec2.Client, groupID string) e
 		},
 	})
 	return err
+}
+
+// splitAndTrim splits a comma-separated list, trimming whitespace and dropping
+// empty entries (e.g. from a trailing comma or stray spaces).
+func splitAndTrim(s string) []string {
+	var out []string
+	for part := range strings.SplitSeq(s, ",") {
+		if p := strings.TrimSpace(part); p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }

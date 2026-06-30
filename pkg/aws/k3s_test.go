@@ -19,11 +19,15 @@ func TestK3sInstallScript_KubernetesMode(t *testing.T) {
 	got := k3sInstallScript(&options.Options{DeploymentMode: options.DeploymentModeKubernetes})
 
 	assert.Contains(t, got, "get.k3s.io")
-	assert.Contains(t, got, "--write-kubeconfig-mode 644")
 	assert.Contains(t, got, "wait --for=condition=Ready node")
 	assert.NotContains(t, got, "INSTALL_K3S_VERSION")
 	assert.NotContains(t, got, "INSTALL_K3S_CHANNEL")
 	assert.NotContains(t, got, "--data-dir")
+
+	// Kubeconfig must be restricted to root and the devsy user, never world-readable.
+	assert.Contains(t, got, "chown root:devsy /etc/rancher/k3s/k3s.yaml")
+	assert.Contains(t, got, "chmod 0640 /etc/rancher/k3s/k3s.yaml")
+	assert.NotContains(t, got, "--write-kubeconfig-mode 644")
 }
 
 func TestK3sInstallScript_DataVolumeUsesDataDir(t *testing.T) {

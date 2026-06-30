@@ -207,6 +207,7 @@ func buildOptionGroups() []OptionGroup {
 				"AWS_VPC_ID",
 				"AWS_SUBNET_ID",
 				"AWS_SECURITY_GROUP_ID",
+				"AWS_SSH_INGRESS_CIDR",
 				"AWS_INSTANCE_PROFILE_ARN",
 				"AWS_INSTANCE_TAGS",
 				"AWS_USE_INSTANCE_CONNECT_ENDPOINT",
@@ -374,6 +375,12 @@ func networkingOptions() Options {
 		"AWS_SECURITY_GROUP_ID": {
 			Description: "The security group id to use. Multiple can be specified by separating with a comma.",
 			Default:     "",
+		},
+		"AWS_SSH_INGRESS_CIDR": {
+			Description: "CIDR allowed to reach SSH (port 22) on a provider-created security group. " +
+				"Defaults to 0.0.0.0/0; set to a trusted range to restrict access. " +
+				"Ignored when a security group is supplied or Session Manager is used.",
+			Default: "0.0.0.0/0",
 		},
 		"AWS_AVAILABILITY_ZONE": {
 			Description: "The name of the AWS availability zone can be specified to choose a subnet out of the desired zone.",

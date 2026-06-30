@@ -14,8 +14,10 @@ func GetInjectKeypairScript(config *options.Options) (string, error) {
 		return "", err
 	}
 
-	publicKey, err := base64.StdEncoding.DecodeString(publicKeyBase)
-	if err != nil {
+	// Validate it is well-formed base64, but inject the encoded form and decode
+	// on the instance so a key comment containing shell metacharacters (", `,
+	// $()) can never be interpreted by the shell.
+	if _, err := base64.StdEncoding.DecodeString(publicKeyBase); err != nil {
 		return "", err
 	}
 
@@ -29,7 +31,7 @@ elif grep -q wheel /etc/group; then
 fi
 echo "devsy ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/91-devsy
 mkdir -p /home/devsy/.ssh
-echo "` + string(publicKey) + `" >> /home/devsy/.ssh/authorized_keys
+echo "` + publicKeyBase + `" | base64 -d >> /home/devsy/.ssh/authorized_keys
 chmod 0700 /home/devsy/.ssh
 chmod 0600 /home/devsy/.ssh/authorized_keys
 chown -R devsy:devsy /home/devsy`

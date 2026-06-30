@@ -241,7 +241,10 @@ func (t *TunnelManager) Start(ctx context.Context, args []string) error {
 }
 
 func (t *TunnelManager) Address() string {
-	return fmt.Sprintf("localhost:%d", t.port)
+	// Use 127.0.0.1 (not "localhost") to match the IPv4 loopback that
+	// findAvailablePort and the AWS CLI tunnel bind, so waitForPort and the SSH
+	// client do not resolve to ::1 on dual-stack hosts.
+	return fmt.Sprintf("127.0.0.1:%d", t.port)
 }
 
 func (t *TunnelManager) Close() error {

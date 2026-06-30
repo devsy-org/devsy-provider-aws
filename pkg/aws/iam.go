@@ -38,7 +38,18 @@ func GetDevsyInstanceProfile(ctx context.Context, provider *AwsProvider) (string
 
 	response, err := svc.GetInstanceProfile(ctx, roleInput)
 	if err != nil {
+		var notFound *iamtypes.NoSuchEntityException
+		if !errors.As(err, &notFound) {
+			return "", fmt.Errorf("get instance profile %s: %w", devsyIAMResourceName, err)
+		}
 		return CreateDevsyInstanceProfile(ctx, provider)
+	}
+
+	// Reconcile policies on the existing role so config changes (e.g. a newly
+	// set KmsKeyARNForSessionManager) are applied. PutRolePolicy/AttachRolePolicy
+	// are idempotent.
+	if err := attachRolePolicies(ctx, svc, provider.Config.KmsKeyARNForSessionManager); err != nil {
+		return "", err
 	}
 
 	log.Debugf("using existing instance profile %s", *response.InstanceProfile.Arn)
