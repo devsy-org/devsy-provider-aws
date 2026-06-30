@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// StopCmd holds the cmd flags
+// StopCmd holds the cmd flags.
 type StopCmd struct{}
 
-// NewStopCmd defines a command
+// NewStopCmd defines a command.
 func NewStopCmd() *cobra.Command {
 	cmd := &StopCmd{}
 	return &cobra.Command{
@@ -29,7 +29,7 @@ func NewStopCmd() *cobra.Command {
 	}
 }
 
-// Run runs the command logic
+// Run runs the command logic.
 func (cmd *StopCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) error {
 	instances, err := aws.GetDevsyRunningInstance(
 		ctx,

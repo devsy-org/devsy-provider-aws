@@ -29,6 +29,41 @@ devsy up .
 
 You'll need to wait for the machine and environment setup.
 
+### Choosing a deployment mode (Docker or Kubernetes)
+
+By default the provider runs your devcontainer as a **Docker** container on the
+EC2 instance. You can instead run it as a **Kubernetes pod** backed by a
+single-node [K3s](https://k3s.io/) cluster that the provider installs on the
+instance.
+
+Select the mode with the `AWS_DEPLOYMENT_MODE` option (`docker` or `kubernetes`):
+
+```sh
+devsy provider set-options -o AWS_DEPLOYMENT_MODE=kubernetes
+```
+
+In `kubernetes` mode the provider:
+
+- installs K3s during instance setup and waits for the node to become `Ready`,
+- writes a world-readable kubeconfig to `/etc/rancher/k3s/k3s.yaml`, which the
+  devsy agent on the instance uses to talk to the local cluster, and
+- runs the devcontainer as a pod in the `AWS_KUBERNETES_NAMESPACE` namespace
+  (default `devsy`), creating the namespace if needed.
+
+When a secondary data volume is configured (see `AWS_DATA_VOLUME_*`), K3s is
+installed with `--data-dir <mount>/k3s` so that pod and image storage live on
+the volume instead of the root disk.
+
+> Requires a devsy CLI that resolves `agent.driver` from a provider option. The
+> driver value is selected per-environment at deploy time.
+
+| NAME                     | REQUIRED | DESCRIPTION                                                        | DEFAULT  |
+| ------------------------ | -------- | ------------------------------------------------------------------ | -------- |
+| AWS_DEPLOYMENT_MODE      | false    | How the devcontainer runs: `docker` or `kubernetes` (K3s).         | docker   |
+| AWS_KUBERNETES_NAMESPACE | false    | Namespace for the devcontainer pod (kubernetes mode only).         | devsy    |
+| AWS_K3S_VERSION          | false    | Pin a specific K3s version, e.g. `v1.30.2+k3s1` (kubernetes only). | latest   |
+| AWS_K3S_CHANNEL          | false    | K3s release channel, e.g. `stable` (ignored if version is set).    |          |
+
 ### Customize the VM Instance
 
 This provider has the following options

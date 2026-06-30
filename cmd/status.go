@@ -22,10 +22,10 @@ type InstanceStatusAccessConfig struct {
 	NatIP string `json:"natIP,omitempty"`
 }
 
-// StatusCmd holds the cmd flags
+// StatusCmd holds the cmd flags.
 type StatusCmd struct{}
 
-// NewStatusCmd defines a command
+// NewStatusCmd defines a command.
 func NewStatusCmd() *cobra.Command {
 	cmd := &StatusCmd{}
 	return &cobra.Command{
@@ -42,7 +42,7 @@ func NewStatusCmd() *cobra.Command {
 	}
 }
 
-// Run runs the command logic
+// Run runs the command logic.
 func (cmd *StatusCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) error {
 	status, err := aws.Status(ctx, providerAws, providerAws.Config.MachineID)
 	if err != nil {
