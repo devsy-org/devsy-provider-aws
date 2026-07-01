@@ -16,10 +16,10 @@ import (
 	gossh "golang.org/x/crypto/ssh"
 )
 
-// CommandCmd holds the cmd flags
+// CommandCmd holds the cmd flags.
 type CommandCmd struct{}
 
-// NewCommandCmd defines a command
+// NewCommandCmd defines a command.
 func NewCommandCmd() *cobra.Command {
 	cmd := &CommandCmd{}
 	return &cobra.Command{
@@ -36,7 +36,7 @@ func NewCommandCmd() *cobra.Command {
 	}
 }
 
-// Run runs the command logic
+// Run runs the command logic.
 func (cmd *CommandCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) error {
 	command := os.Getenv("COMMAND")
 	if command == "" {
@@ -74,14 +74,14 @@ func (cmd *CommandCmd) Run(ctx context.Context, providerAws *aws.AwsProvider) er
 	})
 }
 
-// ConnectionStrategy defines how to connect to an EC2 instance
+// ConnectionStrategy defines how to connect to an EC2 instance.
 type ConnectionStrategy interface {
 	Connect(ctx context.Context, instance *aws.Machine, privateKey []byte) (*gossh.Client, error)
 	Close() error
 	Name() string
 }
 
-// baseTunnelStrategy provides common tunnel + SSH client management
+// baseTunnelStrategy provides common tunnel + SSH client management.
 type baseTunnelStrategy struct {
 	tunnel *TunnelManager
 	client *gossh.Client
@@ -102,7 +102,7 @@ func (s *baseTunnelStrategy) Name() string {
 	return s.name
 }
 
-// DirectSSHStrategy connects via direct SSH
+// DirectSSHStrategy connects via direct SSH.
 type DirectSSHStrategy struct {
 	client *gossh.Client
 }
@@ -132,7 +132,7 @@ func (s *DirectSSHStrategy) Name() string {
 	return "direct-ssh"
 }
 
-// InstanceConnectStrategy connects via EC2 Instance Connect
+// InstanceConnectStrategy connects via EC2 Instance Connect.
 type InstanceConnectStrategy struct {
 	baseTunnelStrategy
 	endpointID string
@@ -176,7 +176,7 @@ func (s *InstanceConnectStrategy) Connect(
 	return client, nil
 }
 
-// SessionManagerStrategy connects via AWS Session Manager
+// SessionManagerStrategy connects via AWS Session Manager.
 type SessionManagerStrategy struct {
 	baseTunnelStrategy
 }
@@ -212,7 +212,7 @@ func (s *SessionManagerStrategy) Connect(
 	return client, nil
 }
 
-// TunnelManager manages AWS CLI tunnel processes
+// TunnelManager manages AWS CLI tunnel processes.
 type TunnelManager struct {
 	cmd    *exec.Cmd
 	port   int
@@ -222,6 +222,8 @@ type TunnelManager struct {
 func (t *TunnelManager) Start(ctx context.Context, args []string) error {
 	cancelCtx, cancel := context.WithCancel(ctx)
 	t.cancel = cancel
+	// args are internally built tunnel arguments for the fixed "aws" CLI.
+	//nolint:gosec // fixed binary, internal args
 	t.cmd = exec.CommandContext(cancelCtx, "aws", args...)
 	if err := t.cmd.Start(); err != nil {
 		cancel()
@@ -239,7 +241,10 @@ func (t *TunnelManager) Start(ctx context.Context, args []string) error {
 }
 
 func (t *TunnelManager) Address() string {
-	return fmt.Sprintf("localhost:%d", t.port)
+	// Use 127.0.0.1 (not "localhost") to match the IPv4 loopback that
+	// findAvailablePort and the AWS CLI tunnel bind, so waitForPort and the SSH
+	// client do not resolve to ::1 on dual-stack hosts.
+	return fmt.Sprintf("127.0.0.1:%d", t.port)
 }
 
 func (t *TunnelManager) Close() error {
@@ -252,7 +257,7 @@ func (t *TunnelManager) Close() error {
 	return nil
 }
 
-// selectStrategy chooses the appropriate connection strategy based on config
+// selectStrategy chooses the appropriate connection strategy based on config.
 func (cmd *CommandCmd) selectStrategy(config *options.Options) ConnectionStrategy {
 	if config.UseInstanceConnectEndpoint {
 		return &InstanceConnectStrategy{endpointID: config.InstanceConnectEndpointID}
@@ -282,7 +287,7 @@ func waitForPort(ctx context.Context, addr string) error {
 }
 
 func findAvailablePort() (int, error) {
-	l, err := net.Listen("tcp", ":0")
+	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return 0, fmt.Errorf("find available port: %w", err)
 	}

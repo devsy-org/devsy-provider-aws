@@ -2,6 +2,11 @@ package aws
 
 import "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
+const (
+	policyVersion = "2012-10-17"
+	effectAllow   = "Allow"
+)
+
 type Machine struct {
 	Status                string
 	InstanceID            string
@@ -83,10 +88,10 @@ type PolicyPrincipal struct {
 // NewEC2AssumeRolePolicy returns the trust policy for EC2 to assume the role.
 func NewEC2AssumeRolePolicy() PolicyDocument {
 	return PolicyDocument{
-		Version: "2012-10-17",
+		Version: policyVersion,
 		Statement: []PolicyStatement{
 			{
-				Effect: "Allow",
+				Effect: effectAllow,
 				Principal: &PolicyPrincipal{
 					Service: "ec2.amazonaws.com",
 				},
@@ -99,17 +104,17 @@ func NewEC2AssumeRolePolicy() PolicyDocument {
 // NewDevsyEC2Policy returns the policy allowing EC2 instance to describe and stop itself.
 func NewDevsyEC2Policy() PolicyDocument {
 	return PolicyDocument{
-		Version: "2012-10-17",
+		Version: policyVersion,
 		Statement: []PolicyStatement{
 			{
 				Sid:      "Describe",
-				Effect:   "Allow",
+				Effect:   effectAllow,
 				Action:   []string{"ec2:DescribeInstances"},
 				Resource: "*",
 			},
 			{
 				Sid:      "Stop",
-				Effect:   "Allow",
+				Effect:   effectAllow,
 				Action:   []string{"ec2:StopInstances"},
 				Resource: "arn:aws:ec2:*:*:instance/*",
 				Condition: map[string]any{
@@ -125,11 +130,11 @@ func NewDevsyEC2Policy() PolicyDocument {
 // NewSSMKMSDecryptPolicy returns the policy allowing SSM to decrypt with the specified KMS key.
 func NewSSMKMSDecryptPolicy(kmsArn string) PolicyDocument {
 	return PolicyDocument{
-		Version: "2012-10-17",
+		Version: policyVersion,
 		Statement: []PolicyStatement{
 			{
 				Sid:      "DecryptSSM",
-				Effect:   "Allow",
+				Effect:   effectAllow,
 				Action:   []string{"kms:Decrypt"},
 				Resource: kmsArn,
 			},
