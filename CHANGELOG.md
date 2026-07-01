@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.4...v1.4.0) (2026-07-01)
+
+
+### Features
+
+* Kubernetes (K3s) deployment mode ([#37](https://github.com/devsy-org/devsy-provider-aws/issues/37)) ([633e997](https://github.com/devsy-org/devsy-provider-aws/commit/633e99756f749d3502410ca619537f67929c373e))
+
 ## [1.3.4](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.3...v1.3.4) (2026-06-30)
 
 
