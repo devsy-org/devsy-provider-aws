@@ -49,7 +49,10 @@ func k3sInstallScript(config *options.Options) string {
 } >> %[2]s 2>&1 || { echo "ERROR: K3s install failed (see %[2]s)" >&2; exit 1; }
 
 # Restrict the cluster-admin kubeconfig to root and the devsy agent user.
-chown root:devsy %[3]s && chmod 0640 %[3]s
+{
+  chown root:devsy %[3]s
+  chmod 0640 %[3]s
+} >> %[2]s 2>&1 || { echo "ERROR: failed to restrict kubeconfig permissions (see %[2]s)" >&2; exit 1; }
 
 # Wait for the K3s API server and the node to become Ready.
 K3S_TRIES=0
