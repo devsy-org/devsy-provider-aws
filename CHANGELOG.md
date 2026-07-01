@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.3.4](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.3...v1.3.4) (2026-06-30)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/aws/aws-sdk-go-v2/service/ec2 to v1.310.0 ([#38](https://github.com/devsy-org/devsy-provider-aws/issues/38)) ([bc88721](https://github.com/devsy-org/devsy-provider-aws/commit/bc887215b1312bfecb1b8414320cd82195db16e2))
+
+## [1.3.3](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.2...v1.3.3) (2026-06-30)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-go-v2 monorepo ([#32](https://github.com/devsy-org/devsy-provider-aws/issues/32)) ([fe9630d](https://github.com/devsy-org/devsy-provider-aws/commit/fe9630d5290e8f9afeb825067c3578bbf037c3f6))
+
+## [1.3.2](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.1...v1.3.2) (2026-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/crypto to v0.53.0 ([#26](https://github.com/devsy-org/devsy-provider-aws/issues/26)) ([46eaf25](https://github.com/devsy-org/devsy-provider-aws/commit/46eaf256110c4a210ed8629811b077aaa30f02fe))
+
+## [1.3.1](https://github.com/devsy-org/devsy-provider-aws/compare/v1.3.0...v1.3.1) (2026-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-go-v2 monorepo ([#24](https://github.com/devsy-org/devsy-provider-aws/issues/24)) ([7aa8770](https://github.com/devsy-org/devsy-provider-aws/commit/7aa87707dd09579092929e660203a1adbe5b41fb))
+
 ## [1.3.0](https://github.com/devsy-org/devsy-provider-aws/compare/v1.2.0...v1.3.0) (2026-06-26)
 
 
