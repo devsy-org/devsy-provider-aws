@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.6](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.5...v1.4.6) (2026-07-08)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/crypto to v0.54.0 ([#53](https://github.com/devsy-org/devsy-provider-aws/issues/53)) ([fe5f418](https://github.com/devsy-org/devsy-provider-aws/commit/fe5f418c58e811f2476e541bcf222dab08ee3053))
+* prevent AWS profile from interfering with explicit credentials ([#52](https://github.com/devsy-org/devsy-provider-aws/issues/52)) ([ee26893](https://github.com/devsy-org/devsy-provider-aws/commit/ee268938b5dda9a54483a7350a7527b3bbdc8612))
+
 ## [1.4.5](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.4...v1.4.5) (2026-07-08)
 
 
