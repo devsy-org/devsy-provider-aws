@@ -318,8 +318,10 @@ func credentialOptions() Options {
 			Command:     `printf "%s" "${AWS_SESSION_TOKEN:-}"`,
 		},
 		"AWS_PROFILE": {
-			Description: "The aws profile name to use",
-			Command:     `printf "%s" "${AWS_PROFILE:-default}"`,
+			Description: "The aws profile name to use. Leave empty to use the default " +
+				"AWS credential chain. Ignored when static access key credentials or a " +
+				"custom credential command are provided.",
+			Command: `printf "%s" "${AWS_PROFILE:-}"`,
 		},
 		"CUSTOM_AWS_CREDENTIAL_COMMAND": {
 			Description: "Shell command which is executed to get the AWS credentials. " +
