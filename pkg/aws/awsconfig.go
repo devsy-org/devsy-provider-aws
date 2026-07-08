@@ -111,49 +111,77 @@ func NewAWSConfig(
 	return cfg, nil
 }
 
-func buildConfigOptions(
-	ctx context.Context,
-	options *options.Options,
-) ([]func(*awsConfig.LoadOptions) error, error) {
-	var opts []func(*awsConfig.LoadOptions) error
+type loadOption = func(*awsConfig.LoadOptions) error
 
+func buildConfigOptions(ctx context.Context, options *options.Options) ([]loadOption, error) {
+	var opts []loadOption
 	if options.Zone != "" {
 		opts = append(opts, awsConfig.WithRegion(options.Zone))
 	}
 
-	switch {
-	case options.AccessKeyID != "" && options.SecretAccessKey != "":
-		log.Debugf("using provided AWS credentials")
-		opts = append(opts, awsConfig.WithCredentialsProvider(credentials.StaticCredentialsProvider{
-			Value: aws.Credentials{
-				AccessKeyID:     options.AccessKeyID,
-				SecretAccessKey: options.SecretAccessKey,
-				SessionToken:    options.SessionToken,
-			},
-		}))
-		opts = append(opts, awsConfig.WithSharedConfigFiles([]string{}))
-		opts = append(opts, awsConfig.WithSharedCredentialsFiles([]string{}))
-	case options.CustomCredentialCommand != "":
-		creds, err := executeCredentialCommand(ctx, options.CustomCredentialCommand)
-		if err != nil {
-			return nil, fmt.Errorf("custom credential command: %w", err)
-		}
-		opts = append(
-			opts,
-			awsConfig.WithCredentialsProvider(credentials.StaticCredentialsProvider{Value: creds}),
-		)
-		opts = append(opts, awsConfig.WithSharedConfigFiles([]string{}))
-		opts = append(opts, awsConfig.WithSharedCredentialsFiles([]string{}))
-	default:
-		profile := os.Getenv("AWS_PROFILE")
-		if profile != "" {
-			log.Debugf("using AWS profile %s", profile)
-		} else {
-			log.Debugf("using default AWS credential chain")
-		}
+	credOpts, err := selectCredentialStrategy(options)(ctx, options)
+	if err != nil {
+		return nil, err
 	}
+	return append(opts, credOpts...), nil
+}
 
-	return opts, nil
+type credentialStrategy func(context.Context, *options.Options) ([]loadOption, error)
+
+// selectCredentialStrategy orders sources by precedence: explicit keys and
+// custom commands over a shared profile, and a shared profile over the default
+// chain.
+func selectCredentialStrategy(o *options.Options) credentialStrategy {
+	switch {
+	case o.AccessKeyID != "" && o.SecretAccessKey != "":
+		return staticKeyCredentials
+	case o.CustomCredentialCommand != "":
+		return customCommandCredentials
+	case os.Getenv("AWS_PROFILE") != "":
+		return profileCredentials
+	default:
+		return defaultChainCredentials
+	}
+}
+
+func staticKeyCredentials(_ context.Context, o *options.Options) ([]loadOption, error) {
+	log.Debugf("using provided AWS credentials")
+	return withStaticCredentials(aws.Credentials{
+		AccessKeyID:     o.AccessKeyID,
+		SecretAccessKey: o.SecretAccessKey,
+		SessionToken:    o.SessionToken,
+	}), nil
+}
+
+func customCommandCredentials(ctx context.Context, o *options.Options) ([]loadOption, error) {
+	creds, err := executeCredentialCommand(ctx, o.CustomCredentialCommand)
+	if err != nil {
+		return nil, fmt.Errorf("custom credential command: %w", err)
+	}
+	return withStaticCredentials(creds), nil
+}
+
+func profileCredentials(_ context.Context, _ *options.Options) ([]loadOption, error) {
+	log.Debugf("using AWS profile %s", os.Getenv("AWS_PROFILE"))
+	return nil, nil
+}
+
+func defaultChainCredentials(_ context.Context, _ *options.Options) ([]loadOption, error) {
+	log.Debugf("using default AWS credential chain")
+	return nil, nil
+}
+
+// withStaticCredentials clears AWS_PROFILE because the SDK loads shared config
+// eagerly whenever it is set, failing even when usable credentials were supplied
+// programmatically.
+func withStaticCredentials(creds aws.Credentials) []loadOption {
+	_ = os.Unsetenv("AWS_PROFILE")
+	_ = os.Unsetenv("AWS_DEFAULT_PROFILE")
+	return []loadOption{
+		awsConfig.WithCredentialsProvider(credentials.StaticCredentialsProvider{Value: creds}),
+		awsConfig.WithSharedConfigFiles([]string{}),
+		awsConfig.WithSharedCredentialsFiles([]string{}),
+	}
 }
 
 func executeCredentialCommand(
