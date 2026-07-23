@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.13](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.12...v1.4.13) (2026-07-23)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/aws/aws-sdk-go-v2/service/route53 to v1.65.2 ([#72](https://github.com/devsy-org/devsy-provider-aws/issues/72)) ([b51582d](https://github.com/devsy-org/devsy-provider-aws/commit/b51582d4316f890c3c22f96c68c7a0e5858e15c5))
+
 ## [1.4.12](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.11...v1.4.12) (2026-07-22)
 
 
