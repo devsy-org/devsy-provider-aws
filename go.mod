@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.30
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.317.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.56.0
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.65.1
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.65.2
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.0
 	github.com/devsy-org/devsy v1.9.8
 	github.com/goccy/go-yaml v1.19.2
