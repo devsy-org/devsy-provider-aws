@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.16](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.15...v1.4.16) (2026-07-28)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-go-v2 monorepo ([#78](https://github.com/devsy-org/devsy-provider-aws/issues/78)) ([e31c94d](https://github.com/devsy-org/devsy-provider-aws/commit/e31c94dee07611942d1dd4978b255e8e6803cbe2))
+
 ## [1.4.15](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.14...v1.4.15) (2026-07-28)
 
 
