@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.20](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.19...v1.4.20) (2026-07-30)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/aws/aws-sdk-go-v2/service/iam to v1.57.0 ([#88](https://github.com/devsy-org/devsy-provider-aws/issues/88)) ([2bbe2e9](https://github.com/devsy-org/devsy-provider-aws/commit/2bbe2e9eaaa19e9d2d869d5335bbdaa8665e159f))
+
 ## [1.4.19](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.18...v1.4.19) (2026-07-29)
 
 
