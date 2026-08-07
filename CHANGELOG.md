@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.28](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.27...v1.4.28) (2026-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/aws/aws-sdk-go-v2/service/ec2 to v1.320.0 ([#104](https://github.com/devsy-org/devsy-provider-aws/issues/104)) ([fe85fe4](https://github.com/devsy-org/devsy-provider-aws/commit/fe85fe4b9d2339c1e8c35e7d11046466c406040e))
+
 ## [1.4.27](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.26...v1.4.27) (2026-08-05)
 
 
