@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.33](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.32...v1.4.33) (2026-08-18)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/aws/aws-sdk-go-v2/service/ec2 to v1.321.3 ([#117](https://github.com/devsy-org/devsy-provider-aws/issues/117)) ([8d83ff8](https://github.com/devsy-org/devsy-provider-aws/commit/8d83ff879820a5579abb97ab6f79177672369ce4))
+* **deps:** update module github.com/stretchr/testify to v1.12.0 ([#116](https://github.com/devsy-org/devsy-provider-aws/issues/116)) ([19a75b3](https://github.com/devsy-org/devsy-provider-aws/commit/19a75b391716ffadd810d25ad686a42f02e48dfd))
+
 ## [1.4.32](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.31...v1.4.32) (2026-08-16)
 
 
