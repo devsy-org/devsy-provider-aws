@@ -35,6 +35,15 @@
       "matchManagers": ["gomod"],
       "automerge": true,
       "prPriority": 3
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "matchFileNames": ["go.mod"],
+      "allowedVersions": "1.26.8",
+      "automerge": false,
+      "description": "keep the Go module version aligned with the pinned Go 1.26.8 toolchain"
     }
   ]
 }
