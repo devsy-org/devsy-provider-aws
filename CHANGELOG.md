@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.35](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.34...v1.4.35) (2026-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/stretchr/testify to v1.12.1 ([#130](https://github.com/devsy-org/devsy-provider-aws/issues/130)) ([597f444](https://github.com/devsy-org/devsy-provider-aws/commit/597f444d5dd51c3faaf3e281e71291cc5e0384cb))
+
 ## [1.4.34](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.33...v1.4.34) (2026-10-15)
 
 
