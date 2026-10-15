@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.34](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.33...v1.4.34) (2026-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update module al.essio.dev/pkg/shellescape to v1.6.1 ([#128](https://github.com/devsy-org/devsy-provider-aws/issues/128)) ([6f10cb1](https://github.com/devsy-org/devsy-provider-aws/commit/6f10cb1fd7d27dd158ec4947a02d3417a7ba6000))
+
 ## [1.4.33](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.32...v1.4.33) (2026-08-18)
 
 
