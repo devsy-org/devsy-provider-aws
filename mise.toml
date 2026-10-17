@@ -1,0 +1,43 @@
+[settings]
+experimental = true
+lockfile = true
+lockfile_platforms = ["linux-x64", "macos-arm64"]
+
+[tool_config]
+locked = true
+
+[tools]
+go = "1.26.8"
+golangci-lint = "2.15.0"
+goreleaser = "2.18.3"
+prek = "0.5.2"
+
+[tasks.setup]
+description = "Install dependencies and git hooks"
+depends = ["setup:dependencies", "setup:hooks"]
+
+[tasks."setup:dependencies"]
+description = "Download Go modules"
+run = "go mod download"
+
+[tasks."setup:hooks"]
+description = "Install prek git hooks"
+run = "prek install"
+
+[tasks."build:cli"]
+description = "Build the cli"
+run = "goreleaser release --snapshot --clean"
+
+[tasks."build:provider:dev"]
+description = "Build provider.yaml for local development"
+depends = ["build:cli"]
+env = { PROJECT_ROOT = "./dist" }
+run = "go run ./hack/provider/main.go v0.0.0 > ./dist/provider.yaml"
+
+[tasks."build:provider:release"]
+description = "Build provider.yaml for GitHub release"
+env = { GITHUB_OWNER = "devsy-org" }
+run = '''
+VERSION="$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")"
+go run ./hack/provider/main.go "$VERSION" > ./dist/provider.yaml
+'''
