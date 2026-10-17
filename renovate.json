@@ -44,6 +44,15 @@
       "allowedVersions": "1.26.8",
       "automerge": false,
       "description": "keep the Go module version aligned with the pinned Go 1.26.8 toolchain"
+    },
+    {
+      "matchManagers": ["mise"],
+      "matchDatasources": ["github-tags"],
+      "matchPackageNames": ["golang/go"],
+      "matchFileNames": ["mise.toml"],
+      "allowedVersions": "1.26.8",
+      "automerge": false,
+      "description": "keep the mise Go toolchain aligned with the Go module version"
     }
   ]
 }
