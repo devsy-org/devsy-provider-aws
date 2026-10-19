@@ -10,7 +10,7 @@ locked = true
 go = "1.26.8"
 golangci-lint = "2.15.0"
 goreleaser = "2.18.3"
-prek = "0.5.5"
+prek = "0.5.6"
 
 [tasks.setup]
 description = "Install dependencies and git hooks"
