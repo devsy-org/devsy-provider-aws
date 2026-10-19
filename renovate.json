@@ -4,19 +4,23 @@
   "automerge": false,
   "automergeType": "pr",
   "automergeStrategy": "squash",
-  "pre-commit": {
-    "enabled": true
-  },
   "dependencyDashboard": false,
   "prConcurrentLimit": 1,
   "platformAutomerge": true,
   "postUpdateOptions": ["gomodTidy"],
-  "packageRules": [
+  "customManagers": [
     {
-      "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "prPriority": -1
-    },
+      "customType": "regex",
+      "description": "prek hook repositories in prek.toml (Renovate has no prek manager yet)",
+      "managerFilePatterns": ["/(^|/)prek\\.toml$/"],
+      "matchStrings": [
+        "repo = \"https://github\\.com/(?<depName>[^\"]+)\"\\s+rev = \"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "loose"
+    }
+  ],
+  "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
       "prPriority": 10
@@ -27,9 +31,19 @@
       "prPriority": 5
     },
     {
-      "matchManagers": ["pre-commit"],
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["prek.toml"],
       "automerge": true,
       "prPriority": 4
+    },
+    {
+      "matchManagers": ["mise"],
+      "matchDatasources": ["github-tags"],
+      "matchPackageNames": ["golang/go"],
+      "matchFileNames": ["mise.toml"],
+      "allowedVersions": ">=1.26.0 <1.27.0",
+      "automerge": false,
+      "description": "keep the mise Go toolchain on the Go 1.26 major line"
     },
     {
       "matchManagers": ["gomod"],
@@ -37,22 +51,9 @@
       "prPriority": 3
     },
     {
-      "matchManagers": ["gomod"],
-      "matchDepNames": ["go"],
-      "matchDepTypes": ["golang"],
-      "matchFileNames": ["go.mod"],
-      "allowedVersions": "1.26.8",
+      "matchUpdateTypes": ["major"],
       "automerge": false,
-      "description": "keep the Go module version aligned with the pinned Go 1.26.8 toolchain"
-    },
-    {
-      "matchManagers": ["mise"],
-      "matchDatasources": ["github-tags"],
-      "matchPackageNames": ["golang/go"],
-      "matchFileNames": ["mise.toml"],
-      "allowedVersions": "1.26.8",
-      "automerge": false,
-      "description": "keep the mise Go toolchain aligned with the Go module version"
+      "prPriority": -1
     }
   ]
 }
