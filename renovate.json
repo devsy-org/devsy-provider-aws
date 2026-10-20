@@ -18,6 +18,18 @@
       ],
       "datasourceTemplate": "github-tags",
       "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "description": "Go toolchain versions in go.mod and prek.toml",
+      "managerFilePatterns": ["/(^|/)(go\\.mod|prek\\.toml)$/"],
+      "matchStrings": [
+        "\\ngo (?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "language_version = \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version",
+      "versioningTemplate": "semver"
     }
   ],
   "packageRules": [
@@ -37,13 +49,11 @@
       "prPriority": 4
     },
     {
-      "matchManagers": ["mise"],
-      "matchDatasources": ["github-tags"],
-      "matchPackageNames": ["golang/go"],
-      "matchFileNames": ["mise.toml"],
+      "groupName": "Go toolchain",
+      "matchPackageNames": ["go", "golang/go"],
       "allowedVersions": ">=1.26.0 <1.27.0",
       "automerge": false,
-      "description": "keep the mise Go toolchain on the Go 1.26 major line"
+      "description": "keep go.mod, mise.toml, and prek.toml on the same Go 1.26 release"
     },
     {
       "matchManagers": ["gomod"],
