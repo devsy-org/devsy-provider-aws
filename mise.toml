@@ -17,8 +17,17 @@ description = "Install dependencies and git hooks"
 depends = ["setup:dependencies", "setup:hooks"]
 
 [tasks."setup:dependencies"]
-description = "Download Go modules"
-run = "go mod download"
+description = "Download Go modules with retries"
+run = '''
+attempt=1
+until go mod download; do
+  if [ "$attempt" -ge 3 ]; then
+    exit 1
+  fi
+  sleep "$((attempt * 5))"
+  attempt="$((attempt + 1))"
+done
+'''
 
 [tasks."setup:hooks"]
 description = "Install prek git hooks"
