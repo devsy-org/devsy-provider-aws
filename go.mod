@@ -1,6 +1,6 @@
 module github.com/devsy-org/devsy-provider-aws
 
-go 1.26.8
+go 1.26.9
 
 require (
 	al.essio.dev/pkg/shellescape v1.6.1
@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/iam v1.64.4
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.70.4
 	github.com/aws/aws-sdk-go-v2/service/sts v1.51.4
-	github.com/devsy-org/devsy v1.23.2
+	github.com/devsy-org/devsy v1.24.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
