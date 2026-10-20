@@ -90,10 +90,10 @@ rev = "v2.15.0"
 hooks = [
   {
     id = "golangci-lint",
-    language_version = "1.26.8"
+    language_version = "1.26.10"
   },
   {
     id = "golangci-lint-fmt",
-    language_version = "1.26.8"
+    language_version = "1.26.10"
   }
 ]
