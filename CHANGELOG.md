@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.39](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.38...v1.4.39) (2026-10-20)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/devsy-org/devsy to v1.24.0 ([#146](https://github.com/devsy-org/devsy-provider-aws/issues/146)) ([4a35b31](https://github.com/devsy-org/devsy-provider-aws/commit/4a35b3138668ad0d8486e986bd55270554380bf2))
+
 ## [1.4.38](https://github.com/devsy-org/devsy-provider-aws/compare/v1.4.37...v1.4.38) (2026-10-15)
 
 
