@@ -9,7 +9,7 @@ locked = true
 [tools]
 go = "1.26.10"
 golangci-lint = "2.15.0"
-goreleaser = "2.18.3"
+goreleaser = "2.19.0"
 prek = "0.5.7"
 
 [tasks.setup]
