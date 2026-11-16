@@ -4,7 +4,9 @@
   "automerge": false,
   "automergeType": "pr",
   "automergeStrategy": "squash",
-  "dependencyDashboard": false,
+  "dependencyDashboard": {
+    "enabled": false
+  },
   "prConcurrentLimit": 1,
   "platformAutomerge": true,
   "postUpdateOptions": ["gomodTidy"],
