@@ -38,14 +38,29 @@ func Create(ctx context.Context, cfg aws.Config, providerAws *AwsProvider) (Mach
 	svc := ec2.NewFromConfig(cfg)
 
 	log.Debugf("launching EC2 instance")
+	started := time.Now()
 	result, err := svc.RunInstances(ctx, instance)
+	instanceID := ""
+	if err == nil && len(result.Instances) > 0 {
+		instanceID = aws.ToString(result.Instances[0].InstanceId)
+	}
+	logAWSStep(
+		ctx,
+		awsStep{
+			operation:  "ec2.run_instances",
+			machineID:  opts.MachineID,
+			instanceID: instanceID,
+			started:    started,
+		},
+		err,
+	)
 	if err != nil {
 		cleanupVolume()
 		return Machine{}, err
 	}
 	log.Debugf("EC2 instance launched: %s", *result.Instances[0].InstanceId)
 
-	instanceID := aws.ToString(result.Instances[0].InstanceId)
+	instanceID = aws.ToString(result.Instances[0].InstanceId)
 
 	terminate := func() {
 		terminateOnCleanup(providerAws, instanceID)

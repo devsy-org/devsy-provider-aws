@@ -21,6 +21,8 @@ const (
 	iamSSMKMSDecryptPolicyName = "ssm-kms-decrypt-policy"
 )
 
+const getInstanceProfileStep = "iam.get_instance_profile"
+
 func GetDevsyInstanceProfile(ctx context.Context, provider *AwsProvider) (string, error) {
 	if provider.Config.InstanceProfileArn != "" {
 		log.Debugf(
@@ -36,14 +38,45 @@ func GetDevsyInstanceProfile(ctx context.Context, provider *AwsProvider) (string
 		InstanceProfileName: aws.String(devsyIAMResourceName),
 	}
 
+	started := time.Now()
 	response, err := svc.GetInstanceProfile(ctx, roleInput)
 	if err != nil {
 		var notFound *iamtypes.NoSuchEntityException
+		if errors.As(err, &notFound) {
+			logAWSStep(
+				ctx,
+				awsStep{
+					operation: getInstanceProfileStep,
+					machineID: provider.Config.MachineID,
+					started:   started,
+				},
+				nil,
+			)
+		} else {
+			logAWSStep(
+				ctx,
+				awsStep{
+					operation: getInstanceProfileStep,
+					machineID: provider.Config.MachineID,
+					started:   started,
+				},
+				err,
+			)
+		}
 		if !errors.As(err, &notFound) {
 			return "", fmt.Errorf("get instance profile %s: %w", devsyIAMResourceName, err)
 		}
 		return CreateDevsyInstanceProfile(ctx, provider)
 	}
+	logAWSStep(
+		ctx,
+		awsStep{
+			operation: getInstanceProfileStep,
+			machineID: provider.Config.MachineID,
+			started:   started,
+		},
+		nil,
+	)
 
 	// Reconcile policies on the existing role so config changes (e.g. a newly
 	// set KmsKeyARNForSessionManager) are applied. PutRolePolicy/AttachRolePolicy
@@ -67,7 +100,18 @@ func CreateDevsyInstanceProfile(ctx context.Context, provider *AwsProvider) (str
 		return "", err
 	}
 
-	return createInstanceProfile(ctx, svc)
+	started := time.Now()
+	profile, err := createInstanceProfile(ctx, svc)
+	logAWSStep(
+		ctx,
+		awsStep{
+			operation: "iam.create_instance_profile",
+			machineID: provider.Config.MachineID,
+			started:   started,
+		},
+		err,
+	)
+	return profile, err
 }
 
 func createIAMRole(ctx context.Context, svc *iam.Client) error {

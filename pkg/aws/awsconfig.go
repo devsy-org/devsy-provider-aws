@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/exec"
@@ -188,7 +189,7 @@ func executeCredentialCommand(
 	ctx context.Context,
 	command string,
 ) (aws.Credentials, error) {
-	log.Debugf("using custom credential command: %s", command)
+	log.Debug("using custom credential command")
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
@@ -197,12 +198,12 @@ func executeCredentialCommand(
 	//nolint:gosec // operator-provided credential command
 	cmd := exec.CommandContext(ctx, "sh", "-c", command)
 	cmd.Stdout = &output
-	cmd.Stderr = log.Writer(log.LevelError)
+	cmd.Stderr = log.Writer(slog.LevelError)
 	if err := cmd.Run(); err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
 			return aws.Credentials{}, fmt.Errorf("credential command timed out after 30s")
 		}
-		return aws.Credentials{}, fmt.Errorf("run command %q: %w", command, err)
+		return aws.Credentials{}, fmt.Errorf("run credential command: %w", err)
 	}
 
 	var creds aws.Credentials

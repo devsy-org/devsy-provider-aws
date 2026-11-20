@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"os"
 	"os/exec"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/devsy-org/devsy-provider-aws/pkg/aws"
 	"github.com/devsy-org/devsy-provider-aws/pkg/options"
+	"github.com/devsy-org/devsy/pkg/log"
 	"github.com/devsy-org/devsy/pkg/ssh"
 	"github.com/spf13/cobra"
 	gossh "golang.org/x/crypto/ssh"
@@ -199,9 +201,22 @@ func (s *SessionManagerStrategy) Connect(
 	}
 
 	s.tunnel = &TunnelManager{port: port}
-	if err := s.tunnel.Start(ctx, args); err != nil {
+	started := time.Now()
+	err = s.tunnel.Start(ctx, args)
+	attrs := []slog.Attr{
+		log.AttrComponent("provider"),
+		log.AttrProvider("aws"),
+		slog.String("aws_step", "ssm.start_session"),
+		log.AttrDurationMs(time.Since(started).Milliseconds()),
+	}
+	if instance.InstanceID != "" {
+		attrs = append(attrs, slog.String("instance_id", instance.InstanceID))
+	}
+	if err != nil {
+		log.ErrorContext(ctx, "AWS operation failed", attrs...)
 		return nil, fmt.Errorf("%s: %w", s.name, err)
 	}
+	log.DebugContext(ctx, "AWS operation completed", attrs...)
 
 	client, err := ssh.NewSSHClient("devsy", s.tunnel.Address(), privateKey)
 	if err != nil {
