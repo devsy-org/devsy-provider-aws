@@ -2,10 +2,12 @@ package aws
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"testing"
 
 	"github.com/devsy-org/devsy-provider-aws/pkg/options"
+	"github.com/devsy-org/devsy/pkg/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -86,5 +88,16 @@ func TestBuildConfigOptionsCredentialPrecedence(t *testing.T) {
 			assert.Len(t, opts, tt.wantOptsLen)
 			assert.Equal(t, tt.wantProfile, os.Getenv("AWS_PROFILE"))
 		})
+	}
+}
+
+func TestCredentialCommandFailureDoesNotExposeCommand(t *testing.T) {
+	logs := log.InitTestObserved(t, slog.LevelDebug)
+	canary := t.Name()
+	_, err := executeCredentialCommand(context.Background(), "unused="+canary+"; exit 1")
+	require.Error(t, err)
+	assert.NotContains(t, err.Error(), canary)
+	for _, entry := range logs.All() {
+		assert.NotContains(t, entry.Message, canary)
 	}
 }

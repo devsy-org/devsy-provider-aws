@@ -102,6 +102,15 @@ You can use a variety of AWS_INSTANCE_TYPE, from [this list](https://github.com/
 AMD, Intel and ARM64 instances, the list is automatically suggested when using
 the GUI application.
 
+## Logging
+
+The provider writes diagnostics to stderr as JSON by default. `DEVSY_LOG_LEVEL`
+selects `error`, `warn`, `info`, `debug`, or `trace`. Standalone invocations
+default to `info`. Devsy passes its effective level to the provider.
+`DEVSY_LOG_FORMAT` accepts `json`, `text`, `plain`, `logfmt`, or `auto`.
+For provider processes, `auto` selects JSON. Invalid values stop the command
+before AWS resources are changed.
+
 ## Local Development
 
 To build and test the provider locally, install [mise](https://mise.jdx.dev/) and run `mise install && mise run build:provider:dev`. The provider file is created in `./dist/provider.yaml`.

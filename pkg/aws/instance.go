@@ -177,7 +177,18 @@ func Start(ctx context.Context, provider *AwsProvider, instanceID string) error 
 		},
 	}
 
+	started := time.Now()
 	_, err := svc.StartInstances(ctx, input)
+	logAWSStep(
+		ctx,
+		awsStep{
+			operation:  "ec2.start_instances",
+			machineID:  provider.Config.MachineID,
+			instanceID: instanceID,
+			started:    started,
+		},
+		err,
+	)
 	if err != nil {
 		return fmt.Errorf("start instance: %w", err)
 	}
@@ -197,7 +208,18 @@ func Stop(ctx context.Context, provider *AwsProvider, instanceID string) error {
 		},
 	}
 
+	started := time.Now()
 	_, err := svc.StopInstances(ctx, input)
+	logAWSStep(
+		ctx,
+		awsStep{
+			operation:  "ec2.stop_instances",
+			machineID:  provider.Config.MachineID,
+			instanceID: instanceID,
+			started:    started,
+		},
+		err,
+	)
 	if err != nil {
 		return fmt.Errorf("stop instance: %w", err)
 	}
@@ -281,7 +303,18 @@ func Delete(ctx context.Context, provider *AwsProvider, machine Machine) error {
 		},
 	}
 
+	started := time.Now()
 	_, err := svc.TerminateInstances(ctx, input)
+	logAWSStep(
+		ctx,
+		awsStep{
+			operation:  "ec2.terminate_instances",
+			machineID:  provider.Config.MachineID,
+			instanceID: machine.InstanceID,
+			started:    started,
+		},
+		err,
+	)
 	if err != nil {
 		return fmt.Errorf("terminate instance: %w", err)
 	}

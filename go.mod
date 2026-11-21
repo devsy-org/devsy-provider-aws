@@ -86,6 +86,7 @@ require (
 	github.com/devsy-org/agentapi v1.0.1 // indirect
 	github.com/devsy-org/api v1.1.0 // indirect
 	github.com/devsy-org/apiserver v1.5.4 // indirect
+	github.com/devsy-org/devsy/logging v0.0.0-20261121002232-42213a6fbc3f
 	github.com/docker/cli v29.8.0+incompatible // indirect
 	github.com/docker/docker v28.5.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.9 // indirect
