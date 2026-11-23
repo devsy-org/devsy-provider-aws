@@ -24,9 +24,15 @@ jobs:
           version: v2.15.0
           only-new-issues: true
 
+  megalinter:
+    name: MegaLinter
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
       - name: megalinter
         uses: oxsecurity/megalinter@9949bad031045f366be2467e00e8371a7328a2e2 # v10
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
