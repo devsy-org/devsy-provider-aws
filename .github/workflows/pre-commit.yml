@@ -24,3 +24,5 @@ jobs:
 
       - run: mise run setup:dependencies
       - run: prek run --all-files
+        env:
+          SKIP: golangci-lint,golangci-lint-fmt

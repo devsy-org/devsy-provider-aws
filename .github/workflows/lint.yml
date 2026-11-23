@@ -24,6 +24,9 @@ jobs:
           version: v2.15.0
           only-new-issues: true
 
+      - name: check Go formatting
+        run: golangci-lint fmt --diff
+
   megalinter:
     name: MegaLinter
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
